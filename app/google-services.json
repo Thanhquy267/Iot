@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "310703455988",
+    "firebase_url": "https://iot-esp8266-5bdda.firebaseio.com",
+    "project_id": "iot-esp8266-5bdda",
+    "storage_bucket": "iot-esp8266-5bdda.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310703455988:android:040e7ec43e1b3d461be8a1",
+        "android_client_info": {
+          "package_name": "com.quyt.iot_demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310703455988-dbser3jev131gp96japfh36ipld6asp5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyY3GUGWSh5hgfH1HuBnBIq10XV-NyrVM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310703455988-dbser3jev131gp96japfh36ipld6asp5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
