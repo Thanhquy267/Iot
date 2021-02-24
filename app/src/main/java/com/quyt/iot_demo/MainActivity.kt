@@ -12,19 +12,13 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.SeekBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.quyt.iot_demo.databinding.ActivityMainBinding
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -36,12 +30,14 @@ class MainActivity : AppCompatActivity() {
     private var mRemoteState = false
     private var mNightState = false
     private var mTimerState = false
+    private val mDatabase = FirebaseDatabase.getInstance()
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         mLayoutBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        //
 
         val param = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50)
         param.gravity = Gravity.BOTTOM
@@ -58,9 +54,8 @@ class MainActivity : AppCompatActivity() {
                     val height = mLayoutBinding.cvProgress.height - event.y.toInt()
                     if (height > mLayoutBinding.cvProgress.height || height < 0) return@setOnTouchListener true
                     param.height = height
-                    val value = height / (mLayoutBinding.cvProgress.height/100)
-                    val valueWithStep = value - (value  % 10)
-                    mLayoutBinding.tvProgress.text = valueWithStep.toString()
+                    mDatabase.getReference("ledValue").setValue(heightProgressToVal(height))
+                    mLayoutBinding.tvProgress.text = heightProgressToVal(height).toString()
                     mLayoutBinding.rlProgress.layoutParams = param
                     return@setOnTouchListener true
                 }
@@ -72,6 +67,15 @@ class MainActivity : AppCompatActivity() {
         buttonState()
     }
 
+    private fun heightProgressToVal(height : Int) : Int{
+        val value = height / (mLayoutBinding.cvProgress.height/100)
+        return value - (value  % 10)
+    }
+
+    private fun valToHeightProgress(value : Int) : Int{
+        return value*8
+    }
+
     private fun buttonState(){
         mLayoutBinding.cvStatus.setOnClickListener {
             mStatusState = !mStatusState
@@ -79,36 +83,45 @@ class MainActivity : AppCompatActivity() {
                 ContextCompat.getColor(this
                 , if (mStatusState) R.color.red54 else R.color.blue31))
             mLayoutBinding.tvStatus.text = if (mStatusState) "ON" else "OFF"
+            mDatabase.getReference("ledState").setValue(if (mStatusState) "ON" else "OFF")
         }
+        //
         mLayoutBinding.cvMotion.setOnClickListener {
             mMotionState =  !mMotionState
             mLayoutBinding.llMotion.setBackgroundColor(
                 ContextCompat.getColor(this
                 , if (mMotionState) R.color.red54 else R.color.blue31))
             mLayoutBinding.tvMotion.text = if (mMotionState) "ON" else "OFF"
+            mDatabase.getReference("motionState").setValue(if (mStatusState) "ON" else "OFF")
         }
+        //
         mLayoutBinding.cvRemote.setOnClickListener {
             mRemoteState =  !mRemoteState
             mLayoutBinding.llRemote.setBackgroundColor(
                 ContextCompat.getColor(this
                 , if (mRemoteState) R.color.red54 else R.color.blue31))
             mLayoutBinding.tvRemote.text = if (mRemoteState) "ON" else "OFF"
+            mDatabase.getReference("remoteState").setValue(if (mStatusState) "ON" else "OFF")
         }
+        //
         mLayoutBinding.cvNight.setOnClickListener {
             mNightState =  !mNightState
             mLayoutBinding.llNight.setBackgroundColor(
                 ContextCompat.getColor(this
                 , if (mNightState) R.color.red54 else R.color.blue31))
             mLayoutBinding.tvNight.text = if (mNightState) "ON" else "OFF"
+            mDatabase.getReference("nightModeState").setValue(if (mStatusState) "ON" else "OFF")
         }
+        //
         mLayoutBinding.cvTimer.setOnClickListener {
             mTimerState =  !mTimerState
             mLayoutBinding.llTimer.setBackgroundColor(
                 ContextCompat.getColor(this
                 , if (mTimerState) R.color.red54 else R.color.blue31))
             mLayoutBinding.tvTimer.text = if (mTimerState) "ON" else "OFF"
+            mDatabase.getReference("timerState").setValue(if (mStatusState) "ON" else "OFF")
         }
-
+        //
         mLayoutBinding.cvStatus.setOnLongClickListener {
             Toast.makeText(this,"LongCLick",Toast.LENGTH_SHORT).show()
             return@setOnLongClickListener true
@@ -165,27 +178,27 @@ class MainActivity : AppCompatActivity() {
 //            createNotification()
 //        }
 //    }
-//
-//
-//    fun createNotification(){
-//        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-//        val audioAttributes = AudioAttributes.Builder()
-//            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-//            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-//            .build()
-//        val notifyChanel = NotificationChannel("123", "test_chanel",NotificationManager.IMPORTANCE_HIGH)
-//        notifyChanel.setSound(defaultSound, null)
-//        notifyChanel.enableVibration(true)
-//        notificationManager.createNotificationChannel(notifyChanel)
-//        //
-//        val builder = NotificationCompat.Builder(this,"123")
-//        builder.setSmallIcon(R.drawable.logo_2)
-//            .setContentTitle(title)
-//            .setContentText("Trời tối rồi")
-//            .setAutoCancel(true)
-//            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-//        val notification = builder.build()
-//        notificationManager.notify(123, notification)
-//    }
+
+
+    fun createNotification(){
+        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .build()
+        val notifyChanel = NotificationChannel("123", "test_chanel",NotificationManager.IMPORTANCE_HIGH)
+        notifyChanel.setSound(defaultSound, null)
+        notifyChanel.enableVibration(true)
+        notificationManager.createNotificationChannel(notifyChanel)
+        //
+        val builder = NotificationCompat.Builder(this,"123")
+        builder.setSmallIcon(R.drawable.logo_2)
+            .setContentTitle(title)
+            .setContentText("Trời tối rồi")
+            .setAutoCancel(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        val notification = builder.build()
+        notificationManager.notify(123, notification)
+    }
 }
