@@ -1,24 +1,29 @@
 package com.quyt.iot_demo
 
-import android.app.DatePickerDialog
-import android.app.DatePickerDialog.OnDateSetListener
-import android.app.TimePickerDialog
-import android.app.TimePickerDialog.OnTimeSetListener
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import com.ikovac.timepickerwithseconds.MyTimePickerDialog
+import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.DialogTimerBinding
-import java.text.SimpleDateFormat
-import java.util.*
+import com.quyt.iot_demo.rxBus.BusMessage
+import com.quyt.iot_demo.rxBus.RxBus
+import java.util.function.Consumer
 
 
 class TimerDialog : DialogFragment() {
     private lateinit var mLayoutBinding: DialogTimerBinding
-    private var mTurnOnCal = Calendar.getInstance()
-    private var mTurnOffCal = Calendar.getInstance()
+    val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(context!!) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,82 +41,134 @@ class TimerDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Handler().postDelayed({
+            availableOnTimer()
+            availableOffTimer()
+        }, 300)
+
         mLayoutBinding.tvTimeTurnOn.setOnClickListener {
-            turnOnDatePicker()
+            turnOnTimePicker()
         }
         mLayoutBinding.tvTimeTurnOff.setOnClickListener {
-            turnOffDatePicker()
+            turnOffTimePicker()
         }
+        mLayoutBinding.cbOn.setOnCheckedChangeListener { _, isChecked ->
+            availableOnTimer(isChecked)
+            if (!isChecked) cancelTimerJob(context!!)
+        }
+        mLayoutBinding.cbOff.setOnCheckedChangeListener { _, isChecked ->
+            availableOffTimer(isChecked)
+            if (!isChecked) cancelTimerJob(context!!, false)
+        }
+        listenData()
     }
 
+    private fun listenData() {
+        RxBus.listen(BusMessage.OnDoneTimerJob::class.java, Consumer {
+            if (it.isOn) {
+                mLayoutBinding.tvTimeTurnOn.text = "0 giây"
+                mLayoutBinding.cbOn.isChecked = false
+                availableOnTimer(false)
+            } else {
+                mLayoutBinding.tvTimeTurnOff.text = "0 giây"
+                mLayoutBinding.cbOff.isChecked = false
+                availableOffTimer(false)
+            }
+        })
+    }
 
-    private fun turnOnDatePicker() {
-        DatePickerDialog(
-            context!!,
-            OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                mTurnOnCal.set(Calendar.YEAR, year)
-                mTurnOnCal.set(Calendar.MONTH, monthOfYear)
-                mTurnOnCal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                turnOnTimePicker()
-            },
-            mTurnOnCal.get(Calendar.YEAR),
-            mTurnOnCal.get(Calendar.MONTH),
-            mTurnOnCal.get(Calendar.DAY_OF_MONTH)
-        ).show()
+    private fun availableOnTimer(on: Boolean = false) {
+        mLayoutBinding.tvTimeTurnOn.alpha = if (on) 1f else 0.5f
+        mLayoutBinding.tvTimeTurnOn.isClickable = on
+    }
+
+    private fun availableOffTimer(off: Boolean = false) {
+        mLayoutBinding.tvTimeTurnOff.alpha = if (off) 1f else 0.5f
+        mLayoutBinding.tvTimeTurnOff.isClickable = off
     }
 
     private fun turnOnTimePicker() {
-        TimePickerDialog(
-            context!!,
-            OnTimeSetListener { _, hour, minute ->
-                mTurnOnCal.set(Calendar.HOUR_OF_DAY, hour)
-                mTurnOnCal.set(Calendar.MINUTE, minute)
-                onPickTurnOnDateResult()
-            },
-            mTurnOnCal.get(Calendar.HOUR_OF_DAY),
-            mTurnOnCal.get(Calendar.MINUTE), true
-        ).show()
-    }
-
-    private fun onPickTurnOnDateResult() {
-        val sdf = SimpleDateFormat("HH:mm - dd/MM/yyyy")
-        val time = sdf.format(mTurnOnCal.time)
-        mLayoutBinding.tvTimeTurnOn.text = time
-    }
-
-
-    private fun turnOffDatePicker() {
-        DatePickerDialog(
-            context!!,
-            OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                mTurnOffCal.set(Calendar.YEAR, year)
-                mTurnOffCal.set(Calendar.MONTH, monthOfYear)
-                mTurnOffCal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                turnOffTimePicker()
-            },
-            mTurnOffCal.get(Calendar.YEAR),
-            mTurnOffCal.get(Calendar.MONTH),
-            mTurnOffCal.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        val mTimePicker =
+            MyTimePickerDialog(
+                context,
+                MyTimePickerDialog.OnTimeSetListener { view, hourOfDay, minute, seconds ->
+                    mLayoutBinding.tvTimeTurnOn.text = milliToTimeFormat(hourOfDay, minute, seconds)
+                    scheduleTimerJob(context!!, dateToMillisecond(hourOfDay, minute, seconds))
+                },
+                0,
+                0,
+                0,
+                true
+            )
+        mTimePicker.show()
     }
 
     private fun turnOffTimePicker() {
-        TimePickerDialog(
-            context!!,
-            OnTimeSetListener { _, hour, minute ->
-                mTurnOffCal.set(Calendar.HOUR_OF_DAY, hour)
-                mTurnOffCal.set(Calendar.MINUTE, minute)
-                onPickTurnOffDateResult()
-            },
-            mTurnOffCal.get(Calendar.HOUR_OF_DAY),
-            mTurnOffCal.get(Calendar.MINUTE), true
-        ).show()
+        val mTimePicker =
+            MyTimePickerDialog(
+                context,
+                MyTimePickerDialog.OnTimeSetListener { view, hourOfDay, minute, seconds ->
+                    mLayoutBinding.tvTimeTurnOff.text =
+                        milliToTimeFormat(hourOfDay, minute, seconds)
+                    scheduleTimerJob(
+                        context!!,
+                        dateToMillisecond(hourOfDay, minute, seconds),
+                        false
+                    )
+                },
+                0,
+                0,
+                0,
+                true
+            )
+        mTimePicker.show()
     }
 
-    private fun onPickTurnOffDateResult() {
-        val sdf = SimpleDateFormat("HH:mm - dd/MM/yyyy")
-        val time = sdf.format(mTurnOffCal.time)
-        mLayoutBinding.tvTimeTurnOff.text = time
+    private fun dateToMillisecond(hour: Int, minutes: Int, second: Int): Long {
+        return (second * 1000 + minutes * 60000 + hour * 3600000).toLong()
+    }
+
+    private fun milliToTimeFormat(hour: Int, minutes: Int, second: Int): String {
+        var timeText = ""
+        if (hour > 0) {
+            timeText += "${hour}h "
+        }
+        if (minutes > 0) {
+            timeText += "${minutes}phút "
+        }
+        if (second > 0) {
+            timeText += "${second}giây"
+        }
+        return timeText
+    }
+
+    private fun scheduleTimerJob(
+        context: Context,
+        timerInMilliseconds: Long,
+        isOn: Boolean = true
+    ) {
+        val componentName = ComponentName(context, TimerJobService::class.java)
+        val info = JobInfo.Builder(
+            if (isOn) Constant.TURN_BULB_ON else Constant.TURN_BULB_OFF,
+            componentName
+        )
+            .setRequiresCharging(false)
+            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+            .setPersisted(false)
+            .setMinimumLatency(timerInMilliseconds)
+            .build()
+        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        val resultCode = scheduler.schedule(info)
+        if (resultCode == JobScheduler.RESULT_SUCCESS) {
+            Log.d("Timer JobService", "JobService job scheduled")
+        } else {
+            Log.d("Timer JobService", "JobService job scheduling failed")
+        }
+    }
+
+    private fun cancelTimerJob(context: Context, isOn: Boolean = true) {
+        val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        scheduler.cancel(if (isOn) Constant.TURN_BULB_ON else Constant.TURN_BULB_OFF)
     }
 
     override fun onResume() {

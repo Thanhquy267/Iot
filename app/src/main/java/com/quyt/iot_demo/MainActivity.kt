@@ -1,13 +1,14 @@
 package com.quyt.iot_demo
 
 import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.ActionBar
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.Context
-import android.media.AudioAttributes
-import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.ViewGroup
@@ -15,10 +16,13 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.quyt.iot_demo.Constant.TURN_BULB_ON
 import com.quyt.iot_demo.databinding.ActivityMainBinding
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -65,6 +69,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         buttonState()
+        listenLedValue(param)
+//        scheduleTimerJob(this,10000)
     }
 
     private fun heightProgressToVal(height : Int) : Int{
@@ -74,6 +80,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun valToHeightProgress(value : Int) : Int{
         return value*8
+    }
+
+    private fun listenLedValue(param : FrameLayout.LayoutParams){
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                val value = dataSnapshot.value as Long
+                param.height = valToHeightProgress(value.toInt())
+                mLayoutBinding.tvProgress.text = value.toString()
+                mLayoutBinding.rlProgress.layoutParams = param
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Toast.makeText(this@MainActivity,databaseError.toException().toString(),Toast.LENGTH_SHORT).show()
+            }
+        }
+        mDatabase.getReference("ledValue").addValueEventListener(postListener)
     }
 
     private fun buttonState(){
@@ -132,6 +156,7 @@ class MainActivity : AppCompatActivity() {
             return@setOnLongClickListener true
         }
     }
+
 //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
 //        setContentView(R.layout.activity_main)
@@ -178,27 +203,4 @@ class MainActivity : AppCompatActivity() {
 //            createNotification()
 //        }
 //    }
-
-
-    fun createNotification(){
-        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val audioAttributes = AudioAttributes.Builder()
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-            .build()
-        val notifyChanel = NotificationChannel("123", "test_chanel",NotificationManager.IMPORTANCE_HIGH)
-        notifyChanel.setSound(defaultSound, null)
-        notifyChanel.enableVibration(true)
-        notificationManager.createNotificationChannel(notifyChanel)
-        //
-        val builder = NotificationCompat.Builder(this,"123")
-        builder.setSmallIcon(R.drawable.logo_2)
-            .setContentTitle(title)
-            .setContentText("Trời tối rồi")
-            .setAutoCancel(true)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        val notification = builder.build()
-        notificationManager.notify(123, notification)
-    }
 }
