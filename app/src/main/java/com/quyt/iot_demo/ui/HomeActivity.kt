@@ -10,8 +10,6 @@ import android.os.Handler
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -22,11 +20,10 @@ import com.quyt.iot_demo.custom.TimePickerCustom
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityHomeBinding
 import com.quyt.iot_demo.databinding.LayoutLocationDialogBinding
-import com.quyt.iot_demo.service.Actions
-import com.quyt.iot_demo.service.LocationService
-import com.quyt.iot_demo.service.ServiceState
-import com.quyt.iot_demo.service.getServiceState
+import com.quyt.iot_demo.service.*
+import com.quyt.iot_demo.ui.auto.AutoActivity
 import java.net.URLDecoder
+
 
 class HomeActivity : AppCompatActivity() {
     lateinit var mLayoutBinding: ActivityHomeBinding
@@ -41,7 +38,9 @@ class HomeActivity : AppCompatActivity() {
         window?.decorView?.systemUiVisibility = 0 // Light text status bar
         window?.statusBarColor = ContextCompat.getColor(this, R.color.primary)
         //
-        actionOnService(Actions.START)
+        val udpConnect = Thread(ClientSendAndListen()).start()
+
+//        actionOnService(Actions.START)
         //
 
 //        mLayoutBinding.drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener{
@@ -63,13 +62,18 @@ class HomeActivity : AppCompatActivity() {
         mLayoutBinding.layoutNavigation.llLocation.setOnClickListener {
             showCustomDialog()
         }
+        mLayoutBinding.layoutNavigation.llAuto.setOnClickListener {
+            val intent = Intent(this, AutoActivity::class.java)
+            startActivity(intent)
+        }
+
         switchState()
         goToDetailAction()
 
-        if (intent?.extras?.getBoolean("TURN_ON", false) == true){
+        if (intent?.extras?.getBoolean("TURN_ON", false) == true) {
             Handler().postDelayed({
                 mLayoutBinding.view.scLivingRoom.performClick()
-            },500)
+            }, 500)
         }
     }
 
@@ -79,11 +83,11 @@ class HomeActivity : AppCompatActivity() {
         Intent(this, LocationService::class.java).also {
             it.action = action.name
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Log.d("HomeActivity","Starting the service in >=26 Mode")
+                Log.d("HomeActivity", "Starting the service in >=26 Mode")
                 startForegroundService(it)
                 return
             }
-            Log.d("HomeActivity","Starting the service in < 26 Mode")
+            Log.d("HomeActivity", "Starting the service in < 26 Mode")
             startService(it)
         }
     }
@@ -189,9 +193,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun createIntent(context: Context,value : Boolean = false) : Intent{
-            val intent = Intent(context,HomeActivity::class.java)
-            intent.putExtra("TURN_ON",value)
+        fun createIntent(context: Context, value: Boolean = false): Intent {
+            val intent = Intent(context, HomeActivity::class.java)
+            intent.putExtra("TURN_ON", value)
             return intent
         }
     }

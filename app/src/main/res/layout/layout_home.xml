@@ -74,7 +74,7 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_light_bulb"
+                        android:src="@drawable/ic_living_room"
                         android:tint="@color/bluef5"
                         android:layout_margin="10dp"/>
 
@@ -121,7 +121,7 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_light_bulb"
+                        android:src="@drawable/ic_kitchen"
                         android:tint="@color/bluef5"
                         android:layout_margin="10dp"/>
 
@@ -178,7 +178,7 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_light_bulb"
+                        android:src="@drawable/ic_bedroom"
                         android:tint="@color/bluef5"
                         android:layout_margin="10dp"/>
 
@@ -225,7 +225,7 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_light_bulb"
+                        android:src="@drawable/ic_bathtub"
                         android:tint="@color/bluef5"
                         android:layout_margin="10dp"/>
 

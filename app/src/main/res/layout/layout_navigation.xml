@@ -23,6 +23,7 @@
 
         <LinearLayout
             android:id="@+id/ll_location"
+            style="@style/clickableCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -43,11 +44,12 @@
                 android:layout_marginStart="15dp"
                 android:text="Vị trí nhà riêng"
                 android:textColor="@color/title_text"
-                android:textSize="15sp" />
+                android:textSize="17sp" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_auto"
+            style="@style/clickableCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -68,7 +70,7 @@
                 android:layout_marginStart="15dp"
                 android:text="Tính năng tự động"
                 android:textColor="@color/title_text"
-                android:textSize="15sp" />
+                android:textSize="17sp" />
         </LinearLayout>
     </LinearLayout>
 </layout>
