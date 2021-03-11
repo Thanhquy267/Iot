@@ -10,10 +10,36 @@
 
     <color name="red54">#f05454</color>
     <color name="grey4e">#534E4E</color>
+    <color name="greyae">#AEAEAE</color>
     <color name="blue76">#2b5876</color>
     <color name="purple76">#4e4376</color>
     <color name="blue31">#222831</color>
     <color name="blue5e">#30475e</color>
     <color name="greydd">#dddddd</color>
     <color name="transparent">@android:color/transparent</color>
+    <color name="purplefe">#A07DFE</color>
+    //
+    <color name="blue_e4">#e4fbff</color>
+    <color name="blue_b8">#b8b5ff</color>
+    <color name="blue_78">#7868e6</color>
+    <color name="grey_ed">#edeef7</color>
+    <color name="blue83">#83B2F8</color>
+    <color name="blue30">#303F9F</color>
+
+    <color name="brown9b">#9b764e</color>
+    <color name="brown80">#809B764E</color>
+    <color name="brown77">#775f43</color>
+
+    <color name="grey17">#171717</color>
+
+    <color name="bluef5">#506FF5</color>
+    <color name="grey25">#1B1F25</color>
+    //
+    <color name="greyf7">#ffffff</color>
+    //
+    <color name="primary">#010101</color>
+    <color name="secondary">#171717</color>
+    <color name="title_text">#fafafa</color>
+    <color name="normal_text">#999999</color>
+
 </resources>
