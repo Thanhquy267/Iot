@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cv_root"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_marginEnd="10dp"
+        android:layout_weight="1"
+        app:cardBackgroundColor="@color/secondary"
+        app:cardCornerRadius="10dp"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_living_room"
+                android:tint="@color/bluef5"
+                android:layout_margin="10dp"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sc_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_alignParentEnd="true"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/tv_watt"
+                android:layout_marginStart="10dp"
+                android:textStyle="bold"
+                android:textColor="@color/title_text"
+                android:text="Phòng khách"/>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_watt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/normal_text"
+                android:text="50w"/>
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

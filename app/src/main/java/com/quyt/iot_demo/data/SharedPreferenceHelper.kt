@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.quyt.iot_demo.model.Device
 
 /**
  * this is manager class that support manage settings of app.
@@ -34,6 +36,10 @@ class SharedPreferenceHelper private constructor(private val context: Context,pr
 //            PreferenceUtils.saveToPrefs(context, USER_INFO, Gson().toJson(userValue))
 //        }
 
+    var userId : String?
+        get() = preference.getString(USER_ID, "")
+        set(value) = preference.edit().putString(USER_ID, value).apply()
+
     var address : String?
         get() = preference.getString(ADDRESS, "")
         set(value) = preference.edit().putString(ADDRESS, value).apply()
@@ -45,6 +51,15 @@ class SharedPreferenceHelper private constructor(private val context: Context,pr
         }
         set(value) {
             PreferenceUtils.saveToPrefs(context, LAT_LNG, Gson().toJson(value))
+        }
+
+    var listDevice : ArrayList<Device>?
+        get() {
+            val json = preference.getString(DEVICE, "")
+            return gson.fromJson(json, object : TypeToken<ArrayList<Device>>() {}.type)
+        }
+        set(value) {
+            PreferenceUtils.saveToPrefs(context, DEVICE, Gson().toJson(value,object : TypeToken<ArrayList<Device>>() {}.type))
         }
 
 
@@ -71,6 +86,8 @@ class SharedPreferenceHelper private constructor(private val context: Context,pr
         private const val TURN_OFF_TIMER = "TURN_OFF_TIMER"
         private const val ADDRESS = "ADDRESS"
         private const val LAT_LNG = "LAT_LNG"
+        private const val USER_ID = "USER_ID"
+        private const val DEVICE = "DEVICE"
 
         /**
          * get settings instance

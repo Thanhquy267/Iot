@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
@@ -35,6 +37,7 @@
         <activity android:name=".ui.WebMapActivity" />
         <activity android:name=".ui.auto.AutoActivity" />
         <activity android:name=".ui.auto.LocationAutoActionActivity" />
+        <activity android:name=".ui.add.AddDeviceActivity" />
 
         <service
             android:name=".TimerJobService"
@@ -43,6 +46,9 @@
             android:name=".service.LocationService"
             android:enabled="true"
             android:exported="false" />
+
+        <service android:name="org.eclipse.paho.android.service.MqttService">
+        </service>
     </application>
 
 </manifest>

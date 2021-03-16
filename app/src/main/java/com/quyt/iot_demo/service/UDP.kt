@@ -7,13 +7,13 @@ import java.io.UnsupportedEncodingException
 import java.net.*
 
 
-class ClientSendAndListen : Runnable {
+class ClientSendAndListen(val ip : String,val listener : OnResult) : Runnable {
     override fun run() {
         var run = true
         try {
             val udpSocket = DatagramSocket(2607)
-            val serverAddr: InetAddress = InetAddress.getByName("192.168.1.17")
-            val buf = "FILES".toByteArray()
+            val serverAddr: InetAddress = InetAddress.getByName(ip)
+            val buf = "quythanh24".toByteArray()
             val packet = DatagramPacket(buf, buf.size, serverAddr, 2607)
             udpSocket.send(packet)
             while (run) {
@@ -25,6 +25,10 @@ class ClientSendAndListen : Runnable {
                     udpSocket.receive(packetRev)
                     val text = String(message, 0, packetRev.length)
                     Log.d("Received text", text)
+                    if (text.isNotEmpty()){
+                        listener.onResult(text)
+                        udpSocket.close()
+                    }
                 } catch (e: IOException) {
                     Log.e(" UDP client has IOException", "error: ", e)
                     run = false
@@ -48,5 +52,10 @@ class ClientSendAndListen : Runnable {
         }
     }
 }
+
+interface OnResult {
+    fun onResult(macId : String)
+}
+
 
 
