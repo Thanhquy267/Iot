@@ -28,6 +28,8 @@ import com.quyt.iot_demo.adapter.OnDeviceListener
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityHomeBinding
 import com.quyt.iot_demo.databinding.LayoutLocationDialogBinding
+import com.quyt.iot_demo.model.ActionType
+import com.quyt.iot_demo.model.ClientType
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.PushMqtt
 import com.quyt.iot_demo.mqtt.MQTTClient
@@ -154,7 +156,8 @@ class HomeActivity : AppCompatActivity() , OnDeviceListener{
 
     override fun onDeviceStateChange(device: Device?) {
         val pushBody = PushMqtt().apply {
-            actionType = "app"
+            clientType = ClientType.APP_TYPE.value
+            actionType = ActionType.CHANGE_STATE.value
             data = device
         }
         mMqttClient.connect("test", "123456",
