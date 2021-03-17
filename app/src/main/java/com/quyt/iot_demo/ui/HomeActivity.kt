@@ -6,25 +6,21 @@ import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
 import com.quyt.iot_demo.Constant
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.adapter.DeviceAdapter
 import com.quyt.iot_demo.adapter.OnDeviceListener
+import com.quyt.iot_demo.data.SetupConnectToServer
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityHomeBinding
 import com.quyt.iot_demo.databinding.LayoutLocationDialogBinding
@@ -32,6 +28,7 @@ import com.quyt.iot_demo.model.ActionType
 import com.quyt.iot_demo.model.ClientType
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.PushMqtt
+import com.quyt.iot_demo.model.response.DeviceResponse
 import com.quyt.iot_demo.mqtt.MQTTClient
 import com.quyt.iot_demo.service.Actions
 import com.quyt.iot_demo.service.LocationService
@@ -40,12 +37,12 @@ import com.quyt.iot_demo.service.getServiceState
 import com.quyt.iot_demo.ui.add.AddDeviceActivity
 import com.quyt.iot_demo.ui.auto.AutoActivity
 import org.eclipse.paho.client.mqttv3.*
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.forEach
-import kotlin.collections.get
 
 
 class HomeActivity : AppCompatActivity() , OnDeviceListener{
@@ -54,7 +51,7 @@ class HomeActivity : AppCompatActivity() , OnDeviceListener{
     val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(this) }
     private val mDatabase = FirebaseDatabase.getInstance()
     private var mDeviceAdapter: DeviceAdapter? = null
-    val mMqttClient = MQTTClient(this, Constant.HOST, "AndroidClient")
+    val mMqttClient = MQTTClient(this, Constant.MQTT_HOST, "AndroidClient")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +62,30 @@ class HomeActivity : AppCompatActivity() , OnDeviceListener{
         window?.statusBarColor = ContextCompat.getColor(this, R.color.primary)
         //
         mSharedPreference.userId = "quythanh24"
+        //
+        val serviceRetrofit = SetupConnectToServer().setupConnect()
+        serviceRetrofit.getDevices()
+            .enqueue(object : Callback<DeviceResponse> {
+                override fun onFailure(call: Call<DeviceResponse>, t: Throwable) {
+                    Log.d("HomeActivity",t.message.toString())
+                }
+
+                override fun onResponse(call: Call<DeviceResponse>, model: Response<DeviceResponse>) {
+                    val repos = model.body()
+                    if (repos != null) {
+                        try {
+                            Log.d("HomeActivity",repos.data?.size.toString())
+                        }catch (e: java.lang.Exception){
+                        }
+
+                    } else {
+                        try {
+
+                        } catch (e: Exception) {
+                        }
+                    }
+                }
+            })
 
 //        mqttClient.publish("QuyThanh", message, 1,
 //            false,
@@ -122,26 +143,26 @@ class HomeActivity : AppCompatActivity() , OnDeviceListener{
 //            }, 500)
 //        }
 
-        mDatabase.getReference("quythanh24").addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-
-            }
-
-            override fun onDataChange(p0: DataSnapshot) {
-                val listDevice = ArrayList<Device>()
-                val value = p0.value
-                (value as HashMap<*, *>).forEach { obj ->
-                    Log.d("AA", "$obj")
-                    val device = Device().apply {
-                        id = (obj.value as HashMap<*, *>)["id"].toString()
-                        name = (obj.value as HashMap<*, *>)["name"].toString()
-                        state = (obj.value as HashMap<*, *>)["state"].toString()
-                    }
-                    listDevice.add(device)
-                }
-//               Toast.makeText(this@HomeActivity,listDevice.toString(),Toast.LENGTH_SHORT).show()
-            }
-        })
+//        mDatabase.getReference("quythanh24").addValueEventListener(object : ValueEventListener {
+//            override fun onCancelled(p0: DatabaseError) {
+//
+//            }
+//
+////            override fun onDataChange(p0: DataSnapshot) {
+////                val listDevice = ArrayList<Device>()
+////                val value = p0.value
+////                (value as HashMap<*, *>).forEach { obj ->
+////                    Log.d("AA", "$obj")
+////                    val device = Device().apply {
+////                        macAddress = (obj.value as HashMap<*, *>)["id"].toString()
+////                        name = (obj.value as HashMap<*, *>)["name"].toString()
+////                        state = (obj.value as HashMap<*, *>)["state"].toString()
+////                    }
+////                    listDevice.add(device)
+////                }
+////               Toast.makeText(this@HomeActivity,listDevice.toString(),Toast.LENGTH_SHORT).show()
+////            }
+//        })
     }
 
     override fun onResume() {
@@ -165,7 +186,7 @@ class HomeActivity : AppCompatActivity() , OnDeviceListener{
                     override fun onSuccess(asyncActionToken: IMqttToken?) {
                         Log.d("MQTTClient", "Connection success")
                         mMqttClient.publish(
-                                device?.id.toString(),
+                                device?.macAddress.toString(),
                                 Gson().toJson(pushBody),
                                 1,
                                 false,

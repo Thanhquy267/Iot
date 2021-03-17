@@ -23,6 +23,7 @@ enum class ClientType(val value : String){
 
 enum class ActionType(val value : String){
     CONNECT("paring"),
+    CREATE("create"),
     UPDATE_INFO("info"),
     CHANGE_STATE("state")
 }

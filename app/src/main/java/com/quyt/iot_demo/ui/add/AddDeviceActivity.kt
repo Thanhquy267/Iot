@@ -6,8 +6,6 @@ import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.google.firebase.database.FirebaseDatabase
@@ -18,13 +16,14 @@ import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityAddDeviceBinding
 import com.quyt.iot_demo.databinding.DialogAddNameBinding
 import com.quyt.iot_demo.esptouch.util.TouchNetUtil
+import com.quyt.iot_demo.model.ActionType
+import com.quyt.iot_demo.model.ClientType
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.PushMqtt
 import com.quyt.iot_demo.mqtt.MQTTClient
 import com.quyt.iot_demo.service.EspTouchListener
 import com.quyt.iot_demo.service.EsptouchAsyncTask4
 import com.quyt.iot_demo.utils.NetUtils
-import io.reactivex.functions.Consumer
 import org.eclipse.paho.client.mqttv3.*
 import java.net.InetAddress
 
@@ -36,7 +35,7 @@ class AddDeviceActivity : AppCompatActivity(), EspTouchListener {
     var mTask: EsptouchAsyncTask4? = null
     private lateinit var mWifiManager: WifiManager
     var mStateResult : StateResult? = null
-    val mMqttClient = MQTTClient(this, Constant.HOST, "AndroidClient")
+    val mMqttClient = MQTTClient(this, Constant.MQTT_HOST, "AndroidClient")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,10 +47,6 @@ class AddDeviceActivity : AppCompatActivity(), EspTouchListener {
     }
 
     fun showCustomDialog(macID: String?) {
-            val newDevice = Device().apply {
-                id = macID
-                state = "off"
-            }
             val alertDialogBuilder = android.app.AlertDialog.Builder(this)
             val binding = DataBindingUtil.inflate<DialogAddNameBinding>(
                 LayoutInflater.from(this),
@@ -65,22 +60,14 @@ class AddDeviceActivity : AppCompatActivity(), EspTouchListener {
 
             binding.tvCancel.setOnClickListener {
                 alert.dismiss()
-//                newDevice.name = "defaul1"
-//                mDatabase.getReference("${mSharedPreference.userId}")
-//                    .child(macID.toString())
-//                    .setValue(newDevice)
             }
             binding.tvOk.setOnClickListener {
                 alert.dismiss()
-                  listenDevice(macID,binding.etName.text.toString())
-//                newDevice.name = binding.etName.text.toString()
-//                mDatabase.getReference("${mSharedPreference.userId}")
-//                    .child(macID.toString())
-//                    .setValue(newDevice)
+                updateDeviceInfo(macID,binding.etName.text.toString())
             }
     }
 
-    private fun listenDevice(macID: String?,deviceName: String?){
+    private fun listenDevice(macID: String?){
         mMqttClient.connect("test", "123456",
                 object : IMqttActionListener {
                     override fun onSuccess(asyncActionToken: IMqttToken?) {
@@ -98,7 +85,6 @@ class AddDeviceActivity : AppCompatActivity(), EspTouchListener {
                                         Log.d("MQTTClient", "Failed to publish message to topic")
                                     }
                                 })
-                        updateDeviceInfo(macID,deviceName)
                     }
 
                     override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
@@ -110,7 +96,14 @@ class AddDeviceActivity : AppCompatActivity(), EspTouchListener {
                     override fun messageArrived(topic: String?, message: MqttMessage?) {
                         val msg = "Receive message: ${message.toString()} from topic: $topic"
                         Log.d("MQTTClient", msg)
+                        val espPushModel = Gson().fromJson(message.toString(),PushMqtt::class.java)
+                        if (espPushModel.clientType == ClientType.ESP_TYPE.value && espPushModel.actionType == ActionType.CONNECT.value){
+                            if (espPushModel.data?.state == "Connect success"){
+                                showCustomDialog(macID)
+                            }else{
 
+                            }
+                        }
                     }
 
                     override fun connectionLost(cause: Throwable?) {
@@ -127,26 +120,28 @@ class AddDeviceActivity : AppCompatActivity(), EspTouchListener {
         super.onDestroy()
         mMqttClient.disconnect(object : IMqttActionListener{
             override fun onSuccess(asyncActionToken: IMqttToken?) {
-                Log.d("MQTTClient","onSuccess")
+                Log.d("MQTTClient","Disconnect")
             }
 
             override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                Log.d("MQTTClient","onFailure")
+                Log.d("MQTTClient","Disconnect Failure")
             }
 
         })
     }
 
 
-    private fun updateDeviceInfo(macID: String?,deviceName : String?){
+    private fun updateDeviceInfo(macID: String?,deviceName: String?){
         val device = Device().apply {
-            this.id = macID
+            this.macAddress = macID
             this.name = deviceName
             this.state = "off"
+            this.userId = 1
         }
 
         val pushBody = PushMqtt().apply {
-            actionType = "app"
+            clientType = ClientType.APP_TYPE.value
+            actionType = ActionType.CREATE.value
             data = device
         }
 
@@ -171,7 +166,7 @@ class AddDeviceActivity : AppCompatActivity(), EspTouchListener {
 
     override fun onPostExecute(macID: String?) {
        runOnUiThread {
-           showCustomDialog(macID)
+           listenDevice(macID)
        }
     }
 
