@@ -15,8 +15,6 @@ import com.quyt.iot_demo.R;
 import com.quyt.iot_demo.esptouch.EsptouchTask;
 import com.quyt.iot_demo.esptouch.IEsptouchResult;
 import com.quyt.iot_demo.esptouch.IEsptouchTask;
-import com.quyt.iot_demo.ui.HomeActivity;
-import com.quyt.iot_demo.ui.add.AddDeviceActivity;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -57,7 +55,7 @@ public class EsptouchAsyncTask4 extends AsyncTask<byte[], IEsptouchResult, List<
     protected void onPreExecute() {
         Activity activity = mActivity.get();
         mProgressDialog = new ProgressDialog(activity);
-        mProgressDialog.setMessage(activity.getString(R.string.esptouch1_configuring_message));
+        mProgressDialog.setMessage(activity.getString(R.string.connecting_device_message));
         mProgressDialog.setCanceledOnTouchOutside(false);
         mProgressDialog.setOnCancelListener(dialog -> {
             synchronized (mLock) {

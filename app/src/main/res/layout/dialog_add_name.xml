@@ -25,9 +25,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="10dp"
                 android:textSize="20sp"
                 android:textColor="@color/title_text"
+                android:hint="Tên thiết bị"
                 tools:text="Phòng khách"/>
             <LinearLayout
                 android:layout_width="match_parent"

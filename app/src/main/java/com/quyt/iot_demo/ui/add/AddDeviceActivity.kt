@@ -153,9 +153,9 @@ class AddDeviceActivity : AppCompatActivity(), EspTouchListener {
                 object : IMqttActionListener {
                     override fun onSuccess(asyncActionToken: IMqttToken?) {
                         Log.d("MQTTClient", "Publish info")
-                        val listDevice = ArrayList<Device>()
-                        listDevice.add(device)
-                        mSharedPreference.listDevice = listDevice
+//                        val listDevice = ArrayList<Device>()
+//                        listDevice.add(device)
+//                        mSharedPreference.listDevice = listDevice
                     }
 
                     override  fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {

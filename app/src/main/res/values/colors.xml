@@ -41,5 +41,7 @@
     <color name="secondary">#171717</color>
     <color name="title_text">#fafafa</color>
     <color name="normal_text">#999999</color>
+    //
+    <color name="grey50">#80000000</color>
 
 </resources>

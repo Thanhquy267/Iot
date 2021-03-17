@@ -16,7 +16,7 @@
     <string name="permission_required_toast">Location permission is required for this app.</string>
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
     //
-    <string name="esptouch1_configuring_message">Đang kết nối với thiết bị</string>
+    <string name="connecting_device_message">Đang kết nối với thiết bị</string>
     <string name="esptouch1_configure_result_failed">EspTouch failed</string>
     <string name="esptouch1_configure_result_success_item">BSSID = %1$s, InetAddress = %2$s</string>
     <string name="esptouch1_configure_result_success">EspTouch</string>

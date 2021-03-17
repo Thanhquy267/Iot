@@ -14,13 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
 import com.quyt.iot_demo.Constant
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.adapter.DeviceAdapter
 import com.quyt.iot_demo.adapter.OnDeviceListener
-import com.quyt.iot_demo.data.SetupConnectToServer
+import com.quyt.iot_demo.data.Api
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityHomeBinding
 import com.quyt.iot_demo.databinding.LayoutLocationDialogBinding
@@ -28,7 +27,6 @@ import com.quyt.iot_demo.model.ActionType
 import com.quyt.iot_demo.model.ClientType
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.PushMqtt
-import com.quyt.iot_demo.model.response.DeviceResponse
 import com.quyt.iot_demo.mqtt.MQTTClient
 import com.quyt.iot_demo.service.Actions
 import com.quyt.iot_demo.service.LocationService
@@ -37,20 +35,17 @@ import com.quyt.iot_demo.service.getServiceState
 import com.quyt.iot_demo.ui.add.AddDeviceActivity
 import com.quyt.iot_demo.ui.auto.AutoActivity
 import org.eclipse.paho.client.mqttv3.*
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
+import java.util.function.Consumer
 
 
-class HomeActivity : AppCompatActivity() , OnDeviceListener{
+class HomeActivity : AppCompatActivity(), OnDeviceListener {
 
     lateinit var mLayoutBinding: ActivityHomeBinding
     val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(this) }
-    private val mDatabase = FirebaseDatabase.getInstance()
     private var mDeviceAdapter: DeviceAdapter? = null
+    private var mListDevice = ArrayList<Device>()
     val mMqttClient = MQTTClient(this, Constant.MQTT_HOST, "AndroidClient")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,65 +58,6 @@ class HomeActivity : AppCompatActivity() , OnDeviceListener{
         //
         mSharedPreference.userId = "quythanh24"
         //
-        val serviceRetrofit = SetupConnectToServer().setupConnect()
-        serviceRetrofit.getDevices()
-            .enqueue(object : Callback<DeviceResponse> {
-                override fun onFailure(call: Call<DeviceResponse>, t: Throwable) {
-                    Log.d("HomeActivity",t.message.toString())
-                }
-
-                override fun onResponse(call: Call<DeviceResponse>, model: Response<DeviceResponse>) {
-                    val repos = model.body()
-                    if (repos != null) {
-                        try {
-                            Log.d("HomeActivity",repos.data?.size.toString())
-                        }catch (e: java.lang.Exception){
-                        }
-
-                    } else {
-                        try {
-
-                        } catch (e: Exception) {
-                        }
-                    }
-                }
-            })
-
-//        mqttClient.publish("QuyThanh", message, 1,
-//            false,
-//            object : IMqttActionListener {
-//                override fun onSuccess(asyncActionToken: IMqttToken?) {
-//                    val msg = "Publish message: $message to topic: QuyThanh"
-//                    Log.d("MQTTClient", msg)
-//
-//                    Toast.makeText(this@HomeActivity, msg, Toast.LENGTH_SHORT).show()
-//                }
-//
-//                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-//                    Log.d("MQTTClient", "Failed to publish message to topic")
-//                }
-//            })
-//        val udpConnect = Thread(ClientSendAndListen()).start()
-
-//        actionOnService(Actions.START)
-        //
-
-//        mLayoutBinding.drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener{
-//            override fun onDrawerStateChanged(newState: Int) {
-//                if (newState == DrawerLayout.STATE_SETTLING) {
-//                    if (window?.statusBarColor == ContextCompat.getColor(this@HomeActivity,R.color.black)){
-//                        setStatusBarColor(false)
-//                    }else{
-//                        setStatusBarColor(true)
-//                    }
-//                }
-//            }
-//            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-//            override fun onDrawerClosed(drawerView: View) {}
-//            override fun onDrawerOpened(drawerView: View) {}
-//
-//        })
-
         mLayoutBinding.layoutNavigation.llLocation.setOnClickListener {
             showCustomDialog()
         }
@@ -142,36 +78,86 @@ class HomeActivity : AppCompatActivity() , OnDeviceListener{
 //                mLayoutBinding.view.scLivingRoom.performClick()
 //            }, 500)
 //        }
-
-//        mDatabase.getReference("quythanh24").addValueEventListener(object : ValueEventListener {
-//            override fun onCancelled(p0: DatabaseError) {
-//
-//            }
-//
-////            override fun onDataChange(p0: DataSnapshot) {
-////                val listDevice = ArrayList<Device>()
-////                val value = p0.value
-////                (value as HashMap<*, *>).forEach { obj ->
-////                    Log.d("AA", "$obj")
-////                    val device = Device().apply {
-////                        macAddress = (obj.value as HashMap<*, *>)["id"].toString()
-////                        name = (obj.value as HashMap<*, *>)["name"].toString()
-////                        state = (obj.value as HashMap<*, *>)["state"].toString()
-////                    }
-////                    listDevice.add(device)
-////                }
-////               Toast.makeText(this@HomeActivity,listDevice.toString(),Toast.LENGTH_SHORT).show()
-////            }
-//        })
+        connectMqtt()
     }
 
     override fun onResume() {
         super.onResume()
-        setupRecyclerView()
+        getDevices()
+    }
+
+    private fun connectMqtt(success : Consumer<Unit>? = null) {
+        mMqttClient.connect("test", "123456",
+            object : IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    Log.d("MQTTClient", "Connection success")
+                    success?.accept(Unit)
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                    Log.d("MQTTClient", "Connection failure: ${exception.toString()}")
+
+                }
+            },
+            object : MqttCallback {
+                override fun messageArrived(topic: String?, message: MqttMessage?) {
+                    val msg = "Receive message: ${message.toString()} from topic: $topic"
+                    Log.d("MQTTClient", msg)
+                }
+
+                override fun connectionLost(cause: Throwable?) {
+                    connectMqtt(success = Consumer {
+                        subscribeButtonState()
+                    })
+                    Log.d("MQTTClient", "Connection lost ${cause.toString()}")
+                }
+
+                override fun deliveryComplete(token: IMqttDeliveryToken?) {
+                    Log.d("MQTTClient", "Delivery complete")
+                }
+            })
+    }
+
+    private fun getDevices() {
+        Api.request(Api.service.getDevices(), this,
+            Consumer { result ->
+                mListDevice.clear()
+                result.data?.forEach {
+                    mListDevice.add(it)
+                }
+                setupRecyclerView()
+                connectMqtt(success = Consumer {
+                    subscribeButtonState()
+                })
+                Log.d("getDeviceApi", result.data?.size.toString())
+            }, Consumer {
+                Log.d("getDeviceApi", it.message.toString())
+            })
+    }
+
+    private fun subscribeButtonState(){
+        if (mMqttClient.isConnected()){
+            mListDevice.forEach {
+            mMqttClient.subscribe(
+                it.macAddress.toString(),
+                1,
+                object : IMqttActionListener {
+                    override fun onSuccess(asyncActionToken: IMqttToken?) {
+
+                    }
+                    override  fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+
+                    }
+                })
+        }
+        }else{
+            connectMqtt()
+        }
     }
 
     private fun setupRecyclerView() {
-        mLayoutBinding.view.rvDevice.adapter = DeviceAdapter(mSharedPreference.listDevice,this)
+        mDeviceAdapter = DeviceAdapter(mListDevice, this)
+        mLayoutBinding.view.rvDevice.adapter = mDeviceAdapter
         mLayoutBinding.view.rvDevice.layoutManager = LinearLayoutManager(this)
     }
 
@@ -181,46 +167,27 @@ class HomeActivity : AppCompatActivity() , OnDeviceListener{
             actionType = ActionType.CHANGE_STATE.value
             data = device
         }
-        mMqttClient.connect("test", "123456",
+        if (mMqttClient.isConnected()) {
+            mMqttClient.publish(
+                device?.macAddress.toString(),
+                Gson().toJson(pushBody),
+                1,
+                false,
                 object : IMqttActionListener {
                     override fun onSuccess(asyncActionToken: IMqttToken?) {
-                        Log.d("MQTTClient", "Connection success")
-                        mMqttClient.publish(
-                                device?.macAddress.toString(),
-                                Gson().toJson(pushBody),
-                                1,
-                                false,
-                                object : IMqttActionListener {
-                                    override fun onSuccess(asyncActionToken: IMqttToken?) {
-                                        Log.d("MQTTClient", "Publish info")
-                                    }
-
-                                    override  fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                                        Log.d("MQTTClient", "Failed to publish message to topic")
-                                    }
-                                })
+                        Log.d("MQTTClient", "Publish info")
                     }
 
-                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                        Log.d("MQTTClient", "Connection failure: ${exception.toString()}")
-
-                    }
-                },
-                object : MqttCallback {
-                    override fun messageArrived(topic: String?, message: MqttMessage?) {
-                        val msg = "Receive message: ${message.toString()} from topic: $topic"
-                        Log.d("MQTTClient", msg)
-                    }
-
-                    override fun connectionLost(cause: Throwable?) {
-                        Log.d("MQTTClient", "Connection lost ${cause.toString()}")
-                    }
-
-                    override fun deliveryComplete(token: IMqttDeliveryToken?) {
-                        Log.d("MQTTClient", "Delivery complete")
+                    override fun onFailure(
+                        asyncActionToken: IMqttToken?,
+                        exception: Throwable?
+                    ) {
+                        Log.d("MQTTClient", "Failed to publish message to topic")
                     }
                 })
-
+        } else {
+            connectMqtt()
+        }
     }
 
     fun String.getBytesByString(): ByteArray? {

@@ -25,6 +25,10 @@ class MQTTClient(context: Context?,
         }
     }
 
+    fun isConnected() : Boolean{
+        return mqttClient.isConnected
+    }
+
     fun subscribe(topic: String,
                   qos: Int = 1,
                   cbSubscribe: IMqttActionListener) {
