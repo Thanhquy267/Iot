@@ -38,8 +38,9 @@
                 android:src="@drawable/ic_baseline_more_vert_24"
                 android:tint="@color/title_text"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="20dp"
-                android:layout_centerVertical="true"/>
+                android:layout_marginEnd="15dp"
+                android:layout_centerVertical="true"
+                android:padding="5dp"/>
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_add"
                 android:layout_width="wrap_content"
@@ -47,14 +48,16 @@
                 android:src="@drawable/ic_baseline_add_24"
                 android:tint="@color/title_text"
                 android:layout_toStartOf="@id/iv_more"
-                android:layout_marginEnd="20dp"
-                android:layout_centerVertical="true"/>
+                android:layout_marginEnd="15dp"
+                android:layout_centerVertical="true"
+                android:padding="5dp"/>
         </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_device"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"/>
 
         <!--        <LinearLayout-->
         <!--            android:layout_width="match_parent"-->

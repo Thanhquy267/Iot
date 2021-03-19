@@ -28,7 +28,7 @@ public class EsptouchAsyncTask4 extends AsyncTask<byte[], IEsptouchResult, List<
     private WeakReference<AppCompatActivity> mActivity;
 
     private final Object mLock = new Object();
-    private ProgressDialog mProgressDialog;
+    ProgressDialog mProgressDialog;
     private AlertDialog mResultDialog;
     private IEsptouchTask mEsptouchTask;
     private EspTouchListener mListener;
@@ -81,8 +81,8 @@ public class EsptouchAsyncTask4 extends AsyncTask<byte[], IEsptouchResult, List<
         if (context != null) {
             IEsptouchResult result = values[0];
             Log.i(TAG, "EspTouchResult: " + result);
-            String text = result.getBssid() + " is connected to the wifi";
-            Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+//            String text = result.getBssid() + " is connected to the wifi";
+//            Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -109,7 +109,7 @@ public class EsptouchAsyncTask4 extends AsyncTask<byte[], IEsptouchResult, List<
     protected void onPostExecute(List<IEsptouchResult> result) {
         AppCompatActivity activity = mActivity.get();
 //        activity.mTask = null;
-        mProgressDialog.dismiss();
+//        mProgressDialog.dismiss();
         if (result == null) {
             mResultDialog = new AlertDialog.Builder(activity)
                     .setMessage(R.string.esptouch1_configure_result_failed_port)
@@ -144,20 +144,13 @@ public class EsptouchAsyncTask4 extends AsyncTask<byte[], IEsptouchResult, List<
             resultMsgList.add(message);
             ip = touchResult.getInetAddress().getHostAddress();
         }
-//        CharSequence[] items = new CharSequence[resultMsgList.size()];
-//        mResultDialog = new AlertDialog.Builder(activity)
-//                .setTitle(R.string.esptouch1_configure_result_success)
-//                .setItems(resultMsgList.toArray(items), null)
-//                .setPositiveButton(android.R.string.ok, null)
-//                .show();
-//        mResultDialog.setCanceledOnTouchOutside(false);
         new Thread(new ClientSendAndListen(ip, this)).start();
     }
 
     @Override
     public void onResult(@NotNull String macId) {
           Log.d("EspMacID",macId);
-          mListener.onPostExecute(macId);
+          mListener.onPostExecute(macId,mProgressDialog);
     }
 }
 

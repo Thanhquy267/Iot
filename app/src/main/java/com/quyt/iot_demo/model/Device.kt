@@ -16,4 +16,7 @@ class Device {
     @SerializedName("state")
     var state : String? = null
 
+    @SerializedName("brightness")
+    var brightness : Int = 0
+
 }

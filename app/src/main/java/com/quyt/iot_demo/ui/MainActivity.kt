@@ -13,10 +13,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.firebase.database.FirebaseDatabase
+import com.google.gson.Gson
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.TimerDialog
 import com.quyt.iot_demo.databinding.ActivityHomeBinding
 import com.quyt.iot_demo.databinding.ActivityMainBinding
+import com.quyt.iot_demo.model.Device
 
 @RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : AppCompatActivity() {
@@ -27,21 +29,20 @@ class MainActivity : AppCompatActivity() {
     private var mRemoteState = false
     private var mNightState = false
     private var mTimerState = false
-    private val mDatabase = FirebaseDatabase.getInstance()
-    private lateinit var mRoom : RoomType
+    private var mDevice : Device? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         mLayoutBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        mRoom = intent.extras?.get("type") as RoomType
-        setActionBar(mRoom.title)
+        mDevice = Gson().fromJson(intent.extras?.get("device") as String,Device::class.java)
+        setActionBar(mDevice?.name?:"")
 //        Toast.makeText(this,intent.get("type",1).toString(),Toast.LENGTH_SHORT).show()
         //
 
-        val param = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50)
-        param.gravity = Gravity.BOTTOM
+        val param = FrameLayout.LayoutParams(50,ViewGroup.LayoutParams.MATCH_PARENT)
+        param.gravity = Gravity.START
 
         mLayoutBinding.cvProgress.setOnTouchListener { v, event ->
             when (event.action) {
@@ -52,11 +53,11 @@ class MainActivity : AppCompatActivity() {
                     return@setOnTouchListener true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val height = mLayoutBinding.cvProgress.height - event.y.toInt()
-                    if (height > mLayoutBinding.cvProgress.height || height < 0) return@setOnTouchListener true
-                    param.height = height
-                    mDatabase.getReference(mRoom.key).child("brightness").setValue(heightProgressToVal(height))
-                    mLayoutBinding.tvProgress.text = heightProgressToVal(height).toString()
+                    val width = event.x.toInt()
+                    if (width > mLayoutBinding.cvProgress.width + 10 || width < 0) return@setOnTouchListener true
+                    param.width = width
+//                    mDatabase.getReference(mRoom.key).child("brightness").setValue(heightProgressToVal(height))
+                    mLayoutBinding.tvProgress.text = heightProgressToVal(width).toString()
                     mLayoutBinding.rlProgress.layoutParams = param
                     return@setOnTouchListener true
                 }
@@ -65,7 +66,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        buttonState()
     }
 
     private fun setActionBar(title : String){
@@ -102,62 +102,6 @@ class MainActivity : AppCompatActivity() {
 //        mDatabase.getReference("ledValue").addValueEventListener(postListener)
 //    }
 
-    private fun buttonState(){
-        mLayoutBinding.cvStatus.setOnClickListener {
-            mStatusState = !mStatusState
-            mLayoutBinding.llStatus.setBackgroundColor(
-                ContextCompat.getColor(this
-                , if (mStatusState) R.color.red54 else R.color.blue31))
-            mLayoutBinding.tvStatus.text = if (mStatusState) "ON" else "OFF"
-            mDatabase.getReference(mRoom.key).child("state").setValue(if (mStatusState) "ON" else "OFF")
-        }
-        //
-        mLayoutBinding.cvMotion.setOnClickListener {
-            mMotionState =  !mMotionState
-            mLayoutBinding.llMotion.setBackgroundColor(
-                ContextCompat.getColor(this
-                , if (mMotionState) R.color.red54 else R.color.blue31))
-            mLayoutBinding.tvMotion.text = if (mMotionState) "ON" else "OFF"
-            mDatabase.getReference(mRoom.key).child("motionState").setValue(if (mStatusState) "ON" else "OFF")
-        }
-        //
-        mLayoutBinding.cvRemote.setOnClickListener {
-            mRemoteState =  !mRemoteState
-            mLayoutBinding.llRemote.setBackgroundColor(
-                ContextCompat.getColor(this
-                , if (mRemoteState) R.color.red54 else R.color.blue31))
-            mLayoutBinding.tvRemote.text = if (mRemoteState) "ON" else "OFF"
-            mDatabase.getReference(mRoom.key).child("remoteState").setValue(if (mStatusState) "ON" else "OFF")
-        }
-        //
-        mLayoutBinding.cvNight.setOnClickListener {
-            mNightState =  !mNightState
-            mLayoutBinding.llNight.setBackgroundColor(
-                ContextCompat.getColor(this
-                , if (mNightState) R.color.red54 else R.color.blue31))
-            mLayoutBinding.tvNight.text = if (mNightState) "ON" else "OFF"
-            mDatabase.getReference(mRoom.key).child("nightModeState").setValue(if (mStatusState) "ON" else "OFF")
-        }
-        //
-        mLayoutBinding.cvTimer.setOnClickListener {
-            mTimerState =  !mTimerState
-            mLayoutBinding.llTimer.setBackgroundColor(
-                ContextCompat.getColor(this
-                , if (mTimerState) R.color.red54 else R.color.blue31))
-            mLayoutBinding.tvTimer.text = if (mTimerState) "ON" else "OFF"
-            mDatabase.getReference(mRoom.key).child("timerState").setValue(if (mStatusState) "ON" else "OFF")
-        }
-        //
-        mLayoutBinding.cvStatus.setOnLongClickListener {
-            Toast.makeText(this,"LongCLick",Toast.LENGTH_SHORT).show()
-            return@setOnLongClickListener true
-        }
-//        mLayoutBinding.cvTimer.setOnLongClickListener {
-//            val timerDialog = TimerDialog()
-//            timerDialog.show(supportFragmentManager,"timerDialog")
-//            return@setOnLongClickListener true
-//        }
-    }
 
 }
 
