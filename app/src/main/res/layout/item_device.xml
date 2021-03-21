@@ -57,66 +57,74 @@
             </RelativeLayout>
             <LinearLayout
                 android:id="@+id/ll_brightness"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/rl_view"
                 android:layout_marginBottom="20dp"
-                android:visibility="gone"
+                android:visibility="visible"
+                android:orientation="vertical"
                 android:gravity="center_vertical">
 
-                <RelativeLayout
-                    android:id="@+id/rl_progress_root"
-                    android:layout_width="wrap_content"
+
+                <androidx.appcompat.widget.AppCompatSeekBar
+                    android:id="@+id/sb_brightness"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:min="0"
+                    android:max="110"/>
+<!--                <RelativeLayout-->
+<!--                    android:id="@+id/rl_progress_root"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:gravity="center"-->
+<!--                    android:orientation="vertical">-->
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/iv_brightness"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="20dp"
-                        android:src="@drawable/ic_brightness"
-                        android:tint="@color/bluef5" />
+<!--                    <androidx.appcompat.widget.AppCompatImageView-->
+<!--                        android:id="@+id/iv_brightness"-->
+<!--                        android:layout_width="30dp"-->
+<!--                        android:layout_height="30dp"-->
+<!--                        android:layout_alignParentEnd="true"-->
+<!--                        android:layout_centerVertical="true"-->
+<!--                        android:layout_marginEnd="20dp"-->
+<!--                        android:src="@drawable/ic_brightness"-->
+<!--                        android:tint="@color/bluef5" />-->
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cv_progress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="20dp"
-                        android:layout_toStartOf="@id/iv_brightness"
-                        android:layout_toEndOf="@id/tv_progress"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_centerVertical="true"
-                        app:cardBackgroundColor="#E8E8E8"
-                        app:cardCornerRadius="15dp">
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/cv_progress"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="20dp"-->
+<!--                        android:layout_toStartOf="@id/iv_brightness"-->
+<!--                        android:layout_toEndOf="@id/tv_progress"-->
+<!--                        android:layout_marginStart="10dp"-->
+<!--                        android:layout_marginEnd="10dp"-->
+<!--                        android:layout_centerVertical="true"-->
+<!--                        app:cardBackgroundColor="#E8E8E8"-->
+<!--                        app:cardCornerRadius="15dp">-->
 
-                        <RelativeLayout
-                            android:id="@+id/rl_progress"
-                            android:layout_width="match_parent"
-                            android:layout_height="20dp"
-                            android:background="@color/bluef5"
-                            android:clickable="false"
-                            android:focusable="false">
+<!--                        <RelativeLayout-->
+<!--                            android:id="@+id/rl_progress"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="20dp"-->
+<!--                            android:background="@color/bluef5"-->
+<!--                            android:clickable="false"-->
+<!--                            android:focusable="false">-->
 
-                        </RelativeLayout>
-                    </androidx.cardview.widget.CardView>
+<!--                        </RelativeLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_progress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="20dp"
-                        android:textAlignment="center"
-                        android:textSize="17sp"
-                        android:minWidth="50dp"
-                        android:textColor="@color/title_text"
-                        android:text="010" />
-                </RelativeLayout>
+<!--                    <androidx.appcompat.widget.AppCompatTextView-->
+<!--                        android:id="@+id/tv_progress"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_alignParentStart="true"-->
+<!--                        android:layout_centerVertical="true"-->
+<!--                        android:layout_marginStart="20dp"-->
+<!--                        android:textAlignment="center"-->
+<!--                        android:textSize="17sp"-->
+<!--                        android:minWidth="50dp"-->
+<!--                        android:textColor="@color/title_text"-->
+<!--                        android:text="010" />-->
+<!--                </RelativeLayout>-->
             </LinearLayout>
         </RelativeLayout>
 

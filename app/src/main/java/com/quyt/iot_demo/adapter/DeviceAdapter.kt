@@ -3,6 +3,7 @@ package com.quyt.iot_demo.adapter
 import android.annotation.SuppressLint
 import android.view.*
 import android.widget.FrameLayout
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -41,49 +42,66 @@ class DeviceViewHolder(val binding: ItemDeviceBinding,val listener: OnDeviceList
     fun bind(item: Device?) {
         binding.tvTitle.text = item?.name
         binding.scSwitch.isChecked = item?.state == "ON"
+        binding.sbBrightness.progress = item?.brightness?:0
         binding.scSwitch.setOnCheckedChangeListener { _, isChecked ->
              item?.state = if(isChecked) "ON" else "OFF"
              listener.onDeviceStateChange(item,binding.scSwitch.isPressed)
         }
-        binding.cvRoot.setOnClickListener {
-            binding.llBrightness.visibility = if(binding.llBrightness.visibility == View.GONE) View.VISIBLE else View.GONE
-        }
+//        binding.cvRoot.setOnClickListener {
+//            binding.llBrightness.visibility = if(binding.llBrightness.visibility == View.GONE) View.VISIBLE else View.GONE
+//        }
 
 
         val param = FrameLayout.LayoutParams(30,ViewGroup.LayoutParams.MATCH_PARENT)
         param.gravity = Gravity.START
 
-        binding.cvProgress.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_UP -> {
-                    return@setOnTouchListener true
-                }
-                MotionEvent.ACTION_DOWN -> {
-                    return@setOnTouchListener true
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val width = event.x.toInt()
-                    if (width > binding.cvProgress.width || width < 0) return@setOnTouchListener true
-                    param.width = width
-                    binding.tvProgress.text = widthProgressToVal(width).toString()
-                    if (item?.brightness != widthProgressToVal(width)){
-                        listener.onBrightnessChange(item)
-                    }
-                    item?.brightness = widthProgressToVal(width)
-                    binding.rlProgress.layoutParams = param
-                    return@setOnTouchListener true
-                }
-                else -> {
-                    return@setOnTouchListener true
-                }
+        var prog = 0
+        binding.sbBrightness.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                prog = progress
             }
-        }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                item?.brightness = prog
+                listener.onBrightnessChange(item)
+            }
+
+        })
+//        binding.cvProgress.setOnTouchListener { v, event ->
+//            when (event.action) {
+//                MotionEvent.ACTION_UP -> {
+//                    listener.onBrightnessChange(item)
+//                    return@setOnTouchListener true
+//                }
+//                MotionEvent.ACTION_DOWN -> {
+//                    return@setOnTouchListener true
+//                }
+//                MotionEvent.ACTION_MOVE -> {
+//                    val width = event.x.toInt()
+//                    if (width > binding.cvProgress.width || width < 0) return@setOnTouchListener true
+//                    param.width = width
+//                    binding.tvProgress.text = widthProgressToVal(width).toString()
+//                    if (item?.brightness != widthProgressToVal(width)){
+//
+//                    }
+//                    item?.brightness = widthProgressToVal(width)
+//                    binding.rlProgress.layoutParams = param
+//                    return@setOnTouchListener true
+//                }
+//                else -> {
+//                    return@setOnTouchListener true
+//                }
+//            }
+//        }
     }
 
-    private fun widthProgressToVal(width : Int) : Int{
-        val value = width / (binding.cvProgress.width/100)
-        return if (value > 100) 100 else value - (value  % 1)
-    }
+//    private fun widthProgressToVal(width : Int) : Int{
+//        val value = width / (binding.cvProgress.width/100)
+//        return if (value > 100) 100 else value - (value  % 1)
+//    }
 }
 
 interface  OnDeviceListener {
