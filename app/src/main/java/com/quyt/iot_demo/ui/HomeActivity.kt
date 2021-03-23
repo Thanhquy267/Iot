@@ -11,7 +11,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.gms.maps.model.LatLng
@@ -88,6 +87,7 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
 
     override fun onConnectSuccess() {
         getDevices()
+        subscribeButtonState()
     }
 
     override fun onMessageArrived(topic: String?, message: MqttMessage?) {
@@ -171,7 +171,6 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
 //                    mListDevice.add((mListDevice.clone() as ArrayList<Device>)[0])
 //                }
                 setupRecyclerView()
-                subscribeButtonState()
                 Log.d("getDeviceApi", result.data?.size.toString())
             }, Consumer {
                 Log.d("getDeviceApi", it.message.toString())
