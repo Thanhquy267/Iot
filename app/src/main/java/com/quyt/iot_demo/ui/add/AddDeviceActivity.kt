@@ -3,25 +3,20 @@ package com.quyt.iot_demo.ui.add
 import android.Manifest
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
-import com.quyt.iot_demo.Constant
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.custom.BaseActivity
+import com.quyt.iot_demo.data.Api
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityAddDeviceBinding
 import com.quyt.iot_demo.databinding.DialogAddNameBinding
@@ -30,11 +25,13 @@ import com.quyt.iot_demo.model.ActionType
 import com.quyt.iot_demo.model.ClientType
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.PushMqtt
-import com.quyt.iot_demo.mqtt.MQTTClient
 import com.quyt.iot_demo.service.EspTouchListener
 import com.quyt.iot_demo.service.EsptouchAsyncTask4
 import com.quyt.iot_demo.utils.NetUtils
-import org.eclipse.paho.client.mqttv3.*
+import io.reactivex.functions.Consumer
+import org.eclipse.paho.client.mqttv3.IMqttActionListener
+import org.eclipse.paho.client.mqttv3.IMqttToken
+import org.eclipse.paho.client.mqttv3.MqttMessage
 import java.net.InetAddress
 
 class AddDeviceActivity : BaseActivity(), EspTouchListener {
@@ -50,8 +47,8 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
         Manifest.permission.ACCESS_FINE_LOCATION
     )
     var mAllPermissionGranted = false
-    var mMacId : String? = null
-    var mProgressDialog : ProgressDialog? = null
+    var mMacId: String? = null
+    var mProgressDialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,21 +77,33 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 113) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-               initData()
-            }else{
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                initData()
+            } else {
                 //Handle always denied
             }
         }
     }
 
     private fun initCheckPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             initData()
-        }else{
+        } else {
             ActivityCompat.requestPermissions(
                 this, arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION
@@ -160,35 +169,42 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
             this.macAddress = macID
             this.name = deviceName
             this.state = "OFF"
-            this.userId = 1
             this.brightness = 0
         }
-
-        val pushBody = PushMqtt().apply {
-            clientType = ClientType.APP_TYPE.value
-            actionType = ActionType.CREATE.value
-            data = device
-        }
-
-        mMqttClient.publish(
-            macID.toString(),
-            Gson().toJson(pushBody),
-            1,
-            false,
-            object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    Log.d("MQTTClient", "Publish info")
-                    finish()
-                }
-
-                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    Log.d("MQTTClient", "Failed to publish message to topic")
-                    Toast.makeText(this@AddDeviceActivity,exception?.message.toString(),Toast.LENGTH_SHORT).show()
-                }
+        Api.request(this, Api.service.addDeviceToHome(1, device),
+            success = Consumer {
+                finish()
+            },
+            error = Consumer {
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
             })
+
+
+//        val pushBody = PushMqtt().apply {
+//            clientType = ClientType.APP_TYPE.value
+//            actionType = ActionType.CREATE.value
+//            data = device
+//        }
+//
+//        mMqttClient.publish(
+//            macID.toString(),
+//            Gson().toJson(pushBody),
+//            1,
+//            false,
+//            object : IMqttActionListener {
+//                override fun onSuccess(asyncActionToken: IMqttToken?) {
+//                    Log.d("MQTTClient", "Publish info")
+//                    finish()
+//                }
+//
+//                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+//                    Log.d("MQTTClient", "Failed to publish message to topic")
+//                    Toast.makeText(this@AddDeviceActivity,exception?.message.toString(),Toast.LENGTH_SHORT).show()
+//                }
+//            })
     }
 
-    override fun onPostExecute(macID: String?,progressDialog: ProgressDialog) {
+    override fun onPostExecute(macID: String?, progressDialog: ProgressDialog) {
         runOnUiThread {
             mMacId = macID
             listenDevice(macID)

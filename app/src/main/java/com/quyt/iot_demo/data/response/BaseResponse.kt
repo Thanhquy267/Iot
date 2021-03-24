@@ -11,4 +11,7 @@ open class BaseResponse {
 
     @SerializedName("message")
     var message : String? = null
+
+    @SerializedName("errorMessage")
+    var errorMessage : String? = null
 }

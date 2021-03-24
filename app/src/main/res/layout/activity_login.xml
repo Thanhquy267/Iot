@@ -31,7 +31,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/title_text"
-                android:inputType="textPassword"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
@@ -58,7 +57,7 @@
             android:id="@+id/cv_login"
             style="@style/clickableCard"
             android:layout_width="120dp"
-            android:layout_height="465dp"
+            android:layout_height="45dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="30dp"
             app:cardBackgroundColor="@color/bluef5"

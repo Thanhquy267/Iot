@@ -1,9 +1,9 @@
 package com.quyt.iot_demo.data.response
 
 import com.google.gson.annotations.SerializedName
-import com.quyt.iot_demo.model.User
+import com.quyt.iot_demo.model.Home
 
-class LoginResponse : BaseResponse() {
+class HomeResponse {
     @SerializedName("data")
-    var data: User? = null
+    var data: ArrayList<Home>? = null
 }

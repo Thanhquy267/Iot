@@ -7,12 +7,16 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.quyt.iot_demo.model.Device
+import com.quyt.iot_demo.model.User
 
 /**
  * this is manager class that support manage settings of app.
  * @author Sang
  */
-class SharedPreferenceHelper private constructor(private val context: Context,private val gson : Gson) {
+class SharedPreferenceHelper private constructor(
+    private val context: Context,
+    private val gson: Gson
+) {
     /**
      * get current doing preference
      * @return
@@ -21,7 +25,7 @@ class SharedPreferenceHelper private constructor(private val context: Context,pr
         PreferenceManager.getDefaultSharedPreferences(context)
 //    private val gson: Gson? = null
 
-//    var selectedAvatarBitmapPath: String
+    //    var selectedAvatarBitmapPath: String
 //        get() = preference.getString(AVATAR_PATH, "")
 //        set(value) = preference.edit().putString(AVATAR_PATH, value).apply()
 //
@@ -36,15 +40,29 @@ class SharedPreferenceHelper private constructor(private val context: Context,pr
 //            PreferenceUtils.saveToPrefs(context, USER_INFO, Gson().toJson(userValue))
 //        }
 
-    var userId : String?
+
+    var isLogging: Boolean?
+        get() = preference.getBoolean(ISLOGGING, false)
+        set(value) = preference.edit().putBoolean(ISLOGGING, value ?: false).apply()
+
+    var currentUser: User?
+        get() {
+            val json = preference.getString(USER, "")
+            return gson.fromJson(json, User::class.java)
+        }
+        set(value) {
+            PreferenceUtils.saveToPrefs(context, USER, Gson().toJson(value))
+        }
+
+    var userId: String?
         get() = preference.getString(USER_ID, "")
         set(value) = preference.edit().putString(USER_ID, value).apply()
 
-    var address : String?
+    var address: String?
         get() = preference.getString(ADDRESS, "")
         set(value) = preference.edit().putString(ADDRESS, value).apply()
 
-    var latlng : LatLng?
+    var latlng: LatLng?
         get() {
             val json = preference.getString(LAT_LNG, "")
             return gson.fromJson(json, LatLng::class.java)
@@ -53,13 +71,17 @@ class SharedPreferenceHelper private constructor(private val context: Context,pr
             PreferenceUtils.saveToPrefs(context, LAT_LNG, Gson().toJson(value))
         }
 
-    var listDevice : ArrayList<Device>?
+    var listDevice: ArrayList<Device>?
         get() {
             val json = preference.getString(DEVICE, "")
             return gson.fromJson(json, object : TypeToken<ArrayList<Device>>() {}.type)
         }
         set(value) {
-            PreferenceUtils.saveToPrefs(context, DEVICE, Gson().toJson(value,object : TypeToken<ArrayList<Device>>() {}.type))
+            PreferenceUtils.saveToPrefs(
+                context,
+                DEVICE,
+                Gson().toJson(value, object : TypeToken<ArrayList<Device>>() {}.type)
+            )
         }
 
 
@@ -88,6 +110,8 @@ class SharedPreferenceHelper private constructor(private val context: Context,pr
         private const val LAT_LNG = "LAT_LNG"
         private const val USER_ID = "USER_ID"
         private const val DEVICE = "DEVICE"
+        private const val USER = "USER"
+        private const val ISLOGGING = "ISLOGGING"
 
         /**
          * get settings instance

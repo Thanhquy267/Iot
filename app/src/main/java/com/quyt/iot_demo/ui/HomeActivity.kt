@@ -11,7 +11,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.gms.maps.model.LatLng
@@ -24,22 +23,19 @@ import com.quyt.iot_demo.data.Api
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityHomeBinding
 import com.quyt.iot_demo.databinding.LayoutLocationDialogBinding
-import com.quyt.iot_demo.model.ActionType
-import com.quyt.iot_demo.model.ClientType
-import com.quyt.iot_demo.model.Device
-import com.quyt.iot_demo.model.PushMqtt
+import com.quyt.iot_demo.model.*
 import com.quyt.iot_demo.service.Actions
 import com.quyt.iot_demo.service.LocationService
 import com.quyt.iot_demo.service.ServiceState
 import com.quyt.iot_demo.service.getServiceState
 import com.quyt.iot_demo.ui.add.AddDeviceActivity
 import com.quyt.iot_demo.ui.auto.AutoActivity
+import io.reactivex.functions.Consumer
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
-import java.util.function.Consumer
 
 
 class HomeActivity : BaseActivity(), OnDeviceListener {
@@ -48,6 +44,7 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
     val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(this) }
     private var mDeviceAdapter: DeviceAdapter? = null
     private var mListDevice = ArrayList<Device>()
+    private var mCurrentHome : Home? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,11 +80,11 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
 
     override fun onResume() {
         super.onResume()
-        getDevices()
+        getHome()
     }
 
     override fun onConnectSuccess() {
-        getDevices()
+        getHome()
     }
 
     override fun onMessageArrived(topic: String?, message: MqttMessage?) {
@@ -102,7 +99,7 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
         mDeviceAdapter?.updateStatus(device)
     }
 
-    override fun onDeviceStateChange(device: Device?,isClick : Boolean) {
+    override fun onDeviceStateChange(device: Device?, isClick: Boolean) {
         if (!isClick) return
         val pushBody = PushMqtt().apply {
             clientType = ClientType.APP_TYPE.value
@@ -131,8 +128,8 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
 
     override fun onItemClicked(device: Device?) {
         val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("device", Gson().toJson(device))
-            startActivity(intent)
+        intent.putExtra("device", Gson().toJson(device))
+        startActivity(intent)
     }
 
     override fun onBrightnessChange(device: Device?) {
@@ -160,12 +157,13 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
             })
     }
 
-    private fun getDevices() {
-        Api.request(Api.service.getDevices(), this,
+    private fun getHome() {
+        Api.request(this, Api.service.getHome(mSharedPreference.currentUser?.id?:0),
             Consumer { result ->
+                mCurrentHome = result.data?.firstOrNull()
                 mListDevice.clear()
-                result.data?.forEach {
-                    mListDevice.add(it)
+                result.data?.firstOrNull()?.devices?.forEach { device ->
+                    mListDevice.add(device)
                 }
 //                for(i in 0..10){
 //                    mListDevice.add((mListDevice.clone() as ArrayList<Device>)[0])
@@ -202,6 +200,11 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
         mLayoutBinding.view.rvDevice.adapter = mDeviceAdapter
         mLayoutBinding.view.rvDevice.layoutManager = LinearLayoutManager(this)
         (mLayoutBinding.view.rvDevice.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        setHomeData()
+    }
+
+    private fun setHomeData(){
+        mLayoutBinding.layoutNavigation.tvHomeName.text = mCurrentHome?.name
     }
 
     fun String.getBytesByString(): ByteArray? {

@@ -3,6 +3,8 @@ package com.quyt.iot_demo.model
 import com.google.gson.annotations.SerializedName
 
 class Device {
+    @SerializedName("id")
+    var id : Int = 0
 
     @SerializedName("macAddress")
     var macAddress : String? = null
@@ -10,13 +12,16 @@ class Device {
     @SerializedName("name")
     var name : String? = null
 
-    @SerializedName("userId")
-    var userId : Int? = null
-
     @SerializedName("state")
     var state : String? = null
 
     @SerializedName("brightness")
     var brightness : Int = 0
+
+    @SerializedName("createdAt")
+    var createdAt : String? = null
+
+    @SerializedName("updatedAt")
+    var updatedAt : String? = null
 
 }

@@ -1,27 +1,33 @@
 package com.quyt.iot_demo.data
 
 import android.content.Context
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable
 import com.google.gson.GsonBuilder
 import com.quyt.iot_demo.Constant
+import com.quyt.iot_demo.data.request.LoginRequest
 import com.quyt.iot_demo.data.response.DeviceResponse
+import com.quyt.iot_demo.data.response.HomeResponse
+import com.quyt.iot_demo.data.response.LoginResponse
+import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.utils.DialogUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import java.util.function.Consumer
+import retrofit2.http.*
 
 
 object Api {
 
     val service: AppRepository by lazy {
         val logging = HttpLoggingInterceptor()
+        logging.level = HttpLoggingInterceptor.Level.BODY
         val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
         val client = OkHttpClient.Builder()
             .addInterceptor(logging)
@@ -38,20 +44,46 @@ object Api {
 
         @GET("/device")
         fun getDevices(): Observable<DeviceResponse>
+
+        @FormUrlEncoded
+        @POST("/access/login")
+        fun login(
+            @Field("email") email: String? = null,
+            @Field("password") password: String? = null
+        ): Observable<LoginResponse>
+
+        @GET("/home")
+        fun getHome(
+            @Query("userId") userId: Int
+        ): Observable<HomeResponse>
+
+        @POST("/home/{homeId}/add-device")
+        fun addDeviceToHome(
+            @Path("homeId") homeId: Int,
+            @Body() device: Device
+        ): Observable<Device>
+
     }
 
-    fun <T> request(request : Observable<T>,context : Context,success : Consumer<T>,error : Consumer<Throwable>){
+    fun <T> request(
+        context: Context,
+        request: Observable<T>,
+        success: Consumer<T>,
+        error: Consumer<Throwable>
+    ) {
         val disposebag = CompositeDisposable()
         val loading = DialogUtils.loading(context)
-        disposebag.add(request
-            .subscribeOn(Schedulers.io()) //(*)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                success.accept(result)
-                loading.dismiss()
-            }, { e ->
-                error.accept(e)
-                loading.dismiss()
-            }))
+        disposebag.add(
+            request
+                .subscribeOn(Schedulers.io()) //(*)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ result ->
+                    success.accept(result)
+                    loading.dismiss()
+                }, { e ->
+                    error.accept(e)
+                    loading.dismiss()
+                })
+        )
     }
 }
