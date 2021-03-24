@@ -1,4 +1,4 @@
-package com.quyt.iot_demo.model.response
+package com.quyt.iot_demo.data.response
 
 import com.google.gson.annotations.SerializedName
 import com.quyt.iot_demo.model.Device

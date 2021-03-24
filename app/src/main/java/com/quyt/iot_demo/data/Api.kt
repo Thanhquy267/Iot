@@ -1,11 +1,9 @@
 package com.quyt.iot_demo.data
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.GsonBuilder
 import com.quyt.iot_demo.Constant
-import com.quyt.iot_demo.model.response.DeviceResponse
-import com.quyt.iot_demo.ui.HomeActivity
+import com.quyt.iot_demo.data.response.DeviceResponse
 import com.quyt.iot_demo.utils.DialogUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

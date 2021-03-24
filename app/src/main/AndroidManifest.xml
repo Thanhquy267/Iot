@@ -26,18 +26,18 @@
         android:theme="@style/Theme.Iotdemo"
         android:usesCleartextTraffic="true">
         <activity android:name=".ui.MainActivity" />
-        <activity android:name=".ui.HomeActivity"
-            android:theme="@style/Theme.Iotdemo.NoActionBar">
+        <activity android:name=".ui.HomeActivity"/>
+        <activity android:name=".ui.WebMapActivity" />
+        <activity android:name=".ui.auto.AutoActivity" />
+        <activity android:name=".ui.auto.LocationAutoActionActivity" />
+        <activity android:name=".ui.add.AddDeviceActivity" />
+        <activity android:name=".ui.auth.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.WebMapActivity" />
-        <activity android:name=".ui.auto.AutoActivity" />
-        <activity android:name=".ui.auto.LocationAutoActionActivity" />
-        <activity android:name=".ui.add.AddDeviceActivity" />
 
         <service
             android:name=".TimerJobService"
