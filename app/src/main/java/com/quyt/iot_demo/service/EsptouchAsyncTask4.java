@@ -148,9 +148,9 @@ public class EsptouchAsyncTask4 extends AsyncTask<byte[], IEsptouchResult, List<
     }
 
     @Override
-    public void onResult(@NotNull String macId) {
-          Log.d("EspMacID",macId);
-          mListener.onPostExecute(macId,mProgressDialog);
+    public void onResult(@NotNull String data) {
+          Log.d("EspMacID",data);
+          mListener.onPostExecute(data,mProgressDialog);
     }
 }
 

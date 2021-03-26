@@ -1,14 +1,13 @@
 package com.quyt.iot_demo.data
 
 import android.content.Context
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable
 import com.google.gson.GsonBuilder
 import com.quyt.iot_demo.Constant
-import com.quyt.iot_demo.data.request.LoginRequest
 import com.quyt.iot_demo.data.response.DeviceResponse
 import com.quyt.iot_demo.data.response.HomeResponse
 import com.quyt.iot_demo.data.response.LoginResponse
 import com.quyt.iot_demo.model.Device
+import com.quyt.iot_demo.model.Home
 import com.quyt.iot_demo.utils.DialogUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,14 +29,14 @@ object Api {
         logging.level = HttpLoggingInterceptor.Level.BODY
         val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
         val client = OkHttpClient.Builder()
-            .addInterceptor(logging)
-            .build()
+                .addInterceptor(logging)
+                .build()
         Retrofit.Builder()
-            .baseUrl(Constant.API_HOST)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create()) //(*)
-            .client(client)
-            .build().create<AppRepository>(AppRepository::class.java)
+                .baseUrl(Constant.API_HOST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create()) //(*)
+                .client(client)
+                .build().create<AppRepository>(AppRepository::class.java)
     }
 
     interface AppRepository {
@@ -48,42 +47,53 @@ object Api {
         @FormUrlEncoded
         @POST("/access/login")
         fun login(
-            @Field("email") email: String? = null,
-            @Field("password") password: String? = null
+                @Field("email") email: String? = null,
+                @Field("password") password: String? = null
         ): Observable<LoginResponse>
 
         @GET("/home")
         fun getHome(
-            @Query("userId") userId: Int
+                @Query("userId") userId: Int
         ): Observable<HomeResponse>
 
         @POST("/home/{homeId}/add-device")
         fun addDeviceToHome(
-            @Path("homeId") homeId: Int,
-            @Body() device: Device
+                @Path("homeId") homeId: Int,
+                @Body device: Device
         ): Observable<Device>
+
+        @PUT("/home/{homeId}/update-location")
+        fun updateHomeLocation(
+                @Path("homeId") homeId: Int,
+                @Body home: Home
+        ): Observable<Home>
+
+        @POST("/context/create")
+        fun createContext(
+                @Body context: com.quyt.iot_demo.model.Context
+        ): Observable<Context>
 
     }
 
     fun <T> request(
-        context: Context,
-        request: Observable<T>,
-        success: Consumer<T>,
-        error: Consumer<Throwable>
+            context: Context,
+            request: Observable<T>,
+            success: Consumer<T>,
+            error: Consumer<Throwable>
     ) {
         val disposebag = CompositeDisposable()
         val loading = DialogUtils.loading(context)
         disposebag.add(
-            request
-                .subscribeOn(Schedulers.io()) //(*)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ result ->
-                    success.accept(result)
-                    loading.dismiss()
-                }, { e ->
-                    error.accept(e)
-                    loading.dismiss()
-                })
+                request
+                        .subscribeOn(Schedulers.io()) //(*)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ result ->
+                            success.accept(result)
+                            loading.dismiss()
+                        }, { e ->
+                            error.accept(e)
+                            loading.dismiss()
+                        })
         )
     }
 }

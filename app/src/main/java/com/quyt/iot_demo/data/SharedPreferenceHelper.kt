@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.quyt.iot_demo.model.Device
+import com.quyt.iot_demo.model.Home
 import com.quyt.iot_demo.model.User
 
 /**
@@ -54,44 +55,14 @@ class SharedPreferenceHelper private constructor(
             PreferenceUtils.saveToPrefs(context, USER, Gson().toJson(value))
         }
 
-    var userId: String?
-        get() = preference.getString(USER_ID, "")
-        set(value) = preference.edit().putString(USER_ID, value).apply()
-
-    var address: String?
-        get() = preference.getString(ADDRESS, "")
-        set(value) = preference.edit().putString(ADDRESS, value).apply()
-
-    var latlng: LatLng?
+    var currentHome: Home?
         get() {
-            val json = preference.getString(LAT_LNG, "")
-            return gson.fromJson(json, LatLng::class.java)
+            val json = preference.getString(HOME, "")
+            return gson.fromJson(json, Home::class.java)
         }
         set(value) {
-            PreferenceUtils.saveToPrefs(context, LAT_LNG, Gson().toJson(value))
+            PreferenceUtils.saveToPrefs(context, HOME, Gson().toJson(value))
         }
-
-    var listDevice: ArrayList<Device>?
-        get() {
-            val json = preference.getString(DEVICE, "")
-            return gson.fromJson(json, object : TypeToken<ArrayList<Device>>() {}.type)
-        }
-        set(value) {
-            PreferenceUtils.saveToPrefs(
-                context,
-                DEVICE,
-                Gson().toJson(value, object : TypeToken<ArrayList<Device>>() {}.type)
-            )
-        }
-
-
-    var turnOnTimer: Long
-        get() = preference.getLong(TURN_ON_TIMER, 0)
-        set(value) = preference.edit().putLong(TURN_ON_TIMER, value).apply()
-
-    var turnOffTimer: Long
-        get() = preference.getLong(TURN_OFF_TIMER, 0)
-        set(value) = preference.edit().putLong(TURN_OFF_TIMER, value).apply()
 
     /**
      * support get value from key
@@ -112,6 +83,7 @@ class SharedPreferenceHelper private constructor(
         private const val DEVICE = "DEVICE"
         private const val USER = "USER"
         private const val ISLOGGING = "ISLOGGING"
+        private const val HOME = "HOME"
 
         /**
          * get settings instance

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondary"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/rg_sensor_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/rb_off"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Tắt"
+                    android:textColor="@color/title_text"
+                    android:textSize="15sp" />
+
+                <RadioButton
+                    android:id="@+id/rb_on"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Bật"
+                    android:textColor="@color/title_text"
+                    android:textSize="15sp" />
+            </RadioGroup>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Độ sáng"
+                android:textColor="@color/title_text"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:textSize="15sp" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/sb_brightness"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:min="0"
+                android:max="110" />
+        </LinearLayout>
+    </LinearLayout>
+</layout>

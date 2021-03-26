@@ -3,7 +3,6 @@ package com.quyt.iot_demo.ui
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -11,13 +10,11 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.adapter.DeviceAdapter
-import com.quyt.iot_demo.adapter.OnDeviceListener
+import com.quyt.iot_demo.adapter.MainPagerAdapter
 import com.quyt.iot_demo.custom.BaseActivity
 import com.quyt.iot_demo.data.Api
 import com.quyt.iot_demo.data.SharedPreferenceHelper
@@ -38,13 +35,16 @@ import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 
 
-class HomeActivity : BaseActivity(), OnDeviceListener {
+class HomeActivity : BaseActivity() {
 
     lateinit var mLayoutBinding: ActivityHomeBinding
     val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(this) }
     private var mDeviceAdapter: DeviceAdapter? = null
     private var mListDevice = ArrayList<Device>()
-    private var mCurrentHome : Home? = null
+    private var mListSensor = ArrayList<Device>()
+    private var mCurrentHome: Home? = null
+    private lateinit var mControlFragment: ControlFragment
+    private lateinit var mSensorFragment: SensorFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,8 +53,6 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
 //        window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR  // Dark text on status bar
         window?.decorView?.systemUiVisibility = 0 // Light text status bar
         window?.statusBarColor = ContextCompat.getColor(this, R.color.primary)
-        //
-        mSharedPreference.userId = "quythanh24"
         //
         mLayoutBinding.layoutNavigation.llLocation.setOnClickListener {
             showCustomDialog()
@@ -76,6 +74,7 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
 //                mLayoutBinding.view.scLivingRoom.performClick()
 //            }, 500)
 //        }
+//        actionOnService(Actions.START)
     }
 
     override fun onResume() {
@@ -91,119 +90,77 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
         super.onMessageArrived(topic, message)
         val pushBody = Gson().fromJson(message.toString(), PushMqtt::class.java)
         if (pushBody.clientType == ClientType.SERVER_TYPE.value && pushBody.actionType == ActionType.CHANGE_STATE.value) {
-            syncButtonState(pushBody.data)
+            if (pushBody.data?.type == "control") {
+                mControlFragment.syncButtonState(pushBody.data)
+            } else {
+                mSensorFragment.changeStatus(pushBody.data)
+            }
         }
     }
 
-    private fun syncButtonState(device: Device?) {
-        mDeviceAdapter?.updateStatus(device)
-    }
-
-    override fun onDeviceStateChange(device: Device?, isClick: Boolean) {
-        if (!isClick) return
-        val pushBody = PushMqtt().apply {
-            clientType = ClientType.APP_TYPE.value
-            actionType = ActionType.CHANGE_STATE.value
-            data = device
-        }
-        mMqttClient.publish(
-            device?.macAddress.toString(),
-            Gson().toJson(pushBody),
-            1,
-            false,
-            object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    Log.d("MQTTClient", "Publish info")
-                }
-
-                override fun onFailure(
-                    asyncActionToken: IMqttToken?,
-                    exception: Throwable?
-                ) {
-                    Log.d("MQTTClient", "Failed to publish message to topic")
-                }
-            })
-    }
-
-
-    override fun onItemClicked(device: Device?) {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("device", Gson().toJson(device))
-        startActivity(intent)
-    }
-
-    override fun onBrightnessChange(device: Device?) {
-        val pushBody = PushMqtt().apply {
-            clientType = ClientType.APP_TYPE.value
-            actionType = ActionType.CHANGE_STATE.value
-            data = device
-        }
-        mMqttClient.publish(
-            device?.macAddress.toString(),
-            Gson().toJson(pushBody),
-            1,
-            false,
-            object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    Log.d("MQTTClient", "Publish info")
-                }
-
-                override fun onFailure(
-                    asyncActionToken: IMqttToken?,
-                    exception: Throwable?
-                ) {
-                    Log.d("MQTTClient", "Failed to publish message to topic")
-                }
-            })
+    private fun initViewPager() {
+        mControlFragment = ControlFragment.newInstance(this, mListDevice, mMqttClient)
+        mSensorFragment = SensorFragment.newInstance(this, mListSensor, mMqttClient)
+        val adapter = MainPagerAdapter(supportFragmentManager)
+        adapter.addFrag(mControlFragment, "Device")
+        adapter.addFrag(mSensorFragment, "Sensor")
+        mLayoutBinding.view.vpMain.adapter = adapter
     }
 
     private fun getHome() {
-        Api.request(this, Api.service.getHome(mSharedPreference.currentUser?.id?:0),
-            Consumer { result ->
-                mCurrentHome = result.data?.firstOrNull()
-                mListDevice.clear()
-                result.data?.firstOrNull()?.devices?.forEach { device ->
-                    mListDevice.add(device)
-                }
+        Api.request(this, Api.service.getHome(mSharedPreference.currentUser?.id ?: 0),
+                Consumer { result ->
+                    mCurrentHome = result.data?.firstOrNull()
+                    mListDevice.clear()
+                    mListSensor.clear()
+                    result.data?.firstOrNull()?.devices?.forEach { device ->
+                        if (device.type == "control") {
+                            mListDevice.add(device)
+                        } else {
+                            mListSensor.add(device)
+                        }
+                    }
 //                for(i in 0..10){
 //                    mListDevice.add((mListDevice.clone() as ArrayList<Device>)[0])
 //                }
-                setupRecyclerView()
-                subscribeButtonState()
-                Log.d("getDeviceApi", result.data?.size.toString())
-            }, Consumer {
-                Log.d("getDeviceApi", it.message.toString())
-            })
+                    mSharedPreference.currentHome = result.data?.firstOrNull()
+                    setupRecyclerView()
+                    initViewPager()
+                    subscribeButtonState()
+                    Log.d("getDeviceApi", result.data?.size.toString())
+                }, Consumer {
+            Log.d("getDeviceApi", it.message.toString())
+        })
     }
 
     private fun subscribeButtonState() {
         if (mMqttClient.isConnected()) {
             mMqttClient.subscribe(
-                "1",
-                1,
-                object : IMqttActionListener {
-                    override fun onSuccess(asyncActionToken: IMqttToken?) {
-                        Log.d("MQTTClient", "Subscribe button state success")
-                    }
+                    "1",
+                    1,
+                    object : IMqttActionListener {
+                        override fun onSuccess(asyncActionToken: IMqttToken?) {
+                            Log.d("MQTTClient", "Subscribe button state success")
+                        }
 
-                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                        Log.d("MQTTClient", "Subscribe button state fail")
-                    }
-                })
+                        override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                            Log.d("MQTTClient", "Subscribe button state fail")
+                        }
+                    })
         } else {
             connectMqtt()
         }
     }
 
     private fun setupRecyclerView() {
-        mDeviceAdapter = DeviceAdapter(mListDevice, this)
-        mLayoutBinding.view.rvDevice.adapter = mDeviceAdapter
-        mLayoutBinding.view.rvDevice.layoutManager = LinearLayoutManager(this)
-        (mLayoutBinding.view.rvDevice.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+//        mDeviceAdapter = DeviceAdapter(mListDevice, this)
+//        mLayoutBinding.view.rvDevice.adapter = mDeviceAdapter
+//        mLayoutBinding.view.rvDevice.layoutManager = LinearLayoutManager(this)
+//        (mLayoutBinding.view.rvDevice.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         setHomeData()
     }
 
-    private fun setHomeData(){
+    private fun setHomeData() {
         mLayoutBinding.layoutNavigation.tvHomeName.text = mCurrentHome?.name
     }
 
@@ -231,8 +188,8 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1) {
-            val result = data?.extras?.getString("result", "") ?: ""
+        if (requestCode == 1 && data != null) {
+            val result = data.extras?.getString("result", "") ?: ""
             val dataString = result.replace("https://www.google.com/maps/place/", "")
             val rawLatlng = dataString.substring(dataString.indexOf("/")).replace("@", "")
 
@@ -244,34 +201,49 @@ class HomeActivity : BaseActivity(), OnDeviceListener {
             val finalLatLng = LatLng(latlng2[0].replace("/", "").toDouble(), latlng2[1].toDouble())
             Log.d("onActivityResult", "${finalLatLng.latitude},${finalLatLng.longitude}")
             Log.d("onActivityResult", finalAddress)
-            mSharedPreference.address = finalAddress
-            mSharedPreference.latlng = finalLatLng
-            val center = Location("center")
-            val crLocation = Location("current")
-            center.latitude = finalLatLng.latitude
-            center.longitude = finalLatLng.longitude
-            crLocation.latitude = 10.8062817
-            crLocation.longitude = 106.6763683
+//            Api.request(this, Api.service.updateHomeLocation(mSharedPreference.currentHome?.id?:0, Home().apply {
+//                this.address = finalAddress
+//                this.geom = Geom().apply {
+//                    val corninate = ArrayList<Double>()
+//                    corninate[0] = finalLatLng.latitude
+//                    corninate[1] = finalLatLng.longitude
+//                    this.coordinates = corninate
+//                }
+//            }),
+//                success = Consumer {
+//                   mSharedPreference.currentHome = it
+//                },
+//                error = Consumer {
+//                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+//                })
 
-            val distance = center.distanceTo(crLocation)
-            Log.d("onActivityResult", distance.toString())
+//            mSharedPreference.address = finalAddress
+//            mSharedPreference.latlng = finalLatLng
+//            val center = Location("center")
+//            val crLocation = Location("current")
+//            center.latitude = finalLatLng.latitude
+//            center.longitude = finalLatLng.longitude
+//            crLocation.latitude = 10.8062817
+//            crLocation.longitude = 106.6763683
+
+//            val distance = center.distanceTo(crLocation)
+//            Log.d("onActivityResult", distance.toString())
         }
     }
 
     fun showCustomDialog() {
         val alertDialogBuilder = AlertDialog.Builder(this)
         val binding = DataBindingUtil.inflate<LayoutLocationDialogBinding>(
-            LayoutInflater.from(this),
-            R.layout.layout_location_dialog,
-            null,
-            false
+                LayoutInflater.from(this),
+                R.layout.layout_location_dialog,
+                null,
+                false
         )
         alertDialogBuilder.setView(binding.root)
         val alert = alertDialogBuilder.show()
         alert.setCancelable(true)
         alert.setCanceledOnTouchOutside(false)
         alert?.window?.setBackgroundDrawableResource(R.color.transparent)
-        binding.tvLocation.text = mSharedPreference.address
 
         binding.tvChange.setOnClickListener {
             val intent = Intent(this, WebMapActivity::class.java)

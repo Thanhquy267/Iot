@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.databinding.ActivityAutoBinding
+import com.quyt.iot_demo.ui.IfFragment
 
 class AutoActivity : AppCompatActivity() {
     lateinit var mLayoutBinding: ActivityAutoBinding
@@ -22,6 +24,14 @@ class AutoActivity : AppCompatActivity() {
         mLayoutBinding.cvDoorTracking.setOnClickListener {
             val intent = Intent(this, DoorTrackingActivity::class.java)
             startActivity(intent)
+        }
+
+        mLayoutBinding.cvAdd.setOnClickListener {
+            val fragmentManager = supportFragmentManager
+            val ft = fragmentManager.beginTransaction()
+            ft.replace(R.id.rl_root, IfFragment.newInstance(this), IfFragment().javaClass.simpleName)
+            ft.addToBackStack(IfFragment().javaClass.simpleName)
+            ft.commitAllowingStateLoss()
         }
     }
 

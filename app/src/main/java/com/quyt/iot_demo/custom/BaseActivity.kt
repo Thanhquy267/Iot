@@ -26,9 +26,9 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!mMqttClient.isConnected()){
-            connectMqtt()
-        }
+//        if (!mMqttClient.isConnected()){
+//            connectMqtt()
+//        }
     }
 
      fun connectMqtt(success : Consumer<Unit>? = null) {

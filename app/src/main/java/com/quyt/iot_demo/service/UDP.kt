@@ -54,7 +54,7 @@ class ClientSendAndListen(val ip : String,val listener : OnResult) : Runnable {
 }
 
 interface OnResult {
-    fun onResult(macId : String)
+    fun onResult(data : String)
 }
 
 

@@ -32,6 +32,7 @@ import io.reactivex.functions.Consumer
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttMessage
+import org.json.JSONObject
 import java.net.InetAddress
 
 class AddDeviceActivity : BaseActivity(), EspTouchListener {
@@ -48,6 +49,7 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
     )
     var mAllPermissionGranted = false
     var mMacId: String? = null
+    var mType: String? = null
     var mProgressDialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,14 +146,14 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
         }
     }
 
-    private fun listenDevice(macID: String?) {
+    private fun listenDevice() {
 
         mMqttClient.subscribe(
-            macID.toString(),
+            mMacId.toString(),
             1,
             object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    val msg = "Subscribed to: ${macID.toString()}"
+                    val msg = "Subscribed to: ${mMacId.toString()}"
                     Log.d("MQTTClient", msg)
                 }
 
@@ -166,6 +168,7 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
 
     private fun updateDeviceInfo(macID: String?, deviceName: String?) {
         val device = Device().apply {
+            this.type = mType
             this.macAddress = macID
             this.name = deviceName
             this.state = "OFF"
@@ -204,10 +207,12 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
 //            })
     }
 
-    override fun onPostExecute(macID: String?, progressDialog: ProgressDialog) {
+    override fun onPostExecute(data: String?, progressDialog: ProgressDialog) {
         runOnUiThread {
-            mMacId = macID
-            listenDevice(macID)
+            val jo = JSONObject(data)
+            mType = jo["type"].toString()
+            mMacId = jo["macAddress"].toString()
+            listenDevice()
             mProgressDialog = progressDialog
         }
     }

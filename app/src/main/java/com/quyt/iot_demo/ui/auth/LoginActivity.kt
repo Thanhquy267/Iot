@@ -20,6 +20,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
+        if (mSharedPreference.currentUser != null && mSharedPreference.isLogging == true) {
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
         if (mSharedPreference.isLogging == true && mSharedPreference.currentUser != null) {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)

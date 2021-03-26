@@ -35,8 +35,8 @@ class LocationService : BaseLocationService() {
         val crLocation = Location("currentLocation")
         crLocation.latitude = location?.latitude?:0.0
         crLocation.longitude = location?.longitude?:0.0
-        homeLocation.latitude =  mSharedPreference.latlng?.latitude?:0.0
-        homeLocation.longitude = mSharedPreference.latlng?.longitude?:0.0
+        homeLocation.latitude =  mSharedPreference.currentHome?.geom?.coordinates?.get(0)?:0.0
+        homeLocation.longitude = mSharedPreference.currentHome?.geom?.coordinates?.get(1)?:0.0
         val distance = crLocation.distanceTo(homeLocation)
         Log.d("DistanceCrToHome",distance.toString())
         if (distance < 100){
