@@ -1,4 +1,4 @@
-package com.quyt.iot_demo.ui
+package com.quyt.iot_demo.ui.auto
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,7 +16,6 @@ import com.quyt.iot_demo.databinding.DialogSensorStateBinding
 import com.quyt.iot_demo.databinding.FragmentIfBinding
 import com.quyt.iot_demo.model.Context
 import com.quyt.iot_demo.model.Device
-import com.quyt.iot_demo.ui.auto.AutoActivity
 
 class IfFragment : Fragment(), ContextSensorListener {
     val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(requireContext()) }

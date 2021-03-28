@@ -11,10 +11,10 @@ class ClientSendAndListen(val ip : String,val listener : OnResult) : Runnable {
     override fun run() {
         var run = true
         try {
-            val udpSocket = DatagramSocket(2604)
+            val udpSocket = DatagramSocket(2609)
             val serverAddr: InetAddress = InetAddress.getByName(ip)
             val buf = "quythanh24".toByteArray()
-            val packet = DatagramPacket(buf, buf.size, serverAddr, 2604)
+            val packet = DatagramPacket(buf, buf.size, serverAddr, 2609)
             udpSocket.send(packet)
             while (run) {
                 try {

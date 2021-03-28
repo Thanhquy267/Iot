@@ -182,29 +182,6 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
                 Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
             })
 
-
-//        val pushBody = PushMqtt().apply {
-//            clientType = ClientType.APP_TYPE.value
-//            actionType = ActionType.CREATE.value
-//            data = device
-//        }
-//
-//        mMqttClient.publish(
-//            macID.toString(),
-//            Gson().toJson(pushBody),
-//            1,
-//            false,
-//            object : IMqttActionListener {
-//                override fun onSuccess(asyncActionToken: IMqttToken?) {
-//                    Log.d("MQTTClient", "Publish info")
-//                    finish()
-//                }
-//
-//                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-//                    Log.d("MQTTClient", "Failed to publish message to topic")
-//                    Toast.makeText(this@AddDeviceActivity,exception?.message.toString(),Toast.LENGTH_SHORT).show()
-//                }
-//            })
     }
 
     override fun onPostExecute(data: String?, progressDialog: ProgressDialog) {

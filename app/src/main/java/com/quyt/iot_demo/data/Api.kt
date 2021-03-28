@@ -71,7 +71,7 @@ object Api {
         @POST("/context/create")
         fun createContext(
                 @Body context: com.quyt.iot_demo.model.Context
-        ): Observable<Context>
+        ): Observable<com.quyt.iot_demo.model.Context>
 
     }
 

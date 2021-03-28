@@ -1,4 +1,4 @@
-package com.quyt.iot_demo.ui
+package com.quyt.iot_demo.ui.auto
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +19,6 @@ import com.quyt.iot_demo.databinding.DialogDeviceStateBinding
 import com.quyt.iot_demo.databinding.FragmentThenBinding
 import com.quyt.iot_demo.model.Context
 import com.quyt.iot_demo.model.Device
-import com.quyt.iot_demo.ui.auto.AutoActivity
 import io.reactivex.functions.Consumer
 
 class ThenFragment : Fragment(), ContextDeviceListener {
@@ -95,10 +94,6 @@ class ThenFragment : Fragment(), ContextDeviceListener {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 item.brightness = seekBar?.progress ?: 0
-                if (itemAdded != null) {
-                    mContextModel.devices?.remove(itemAdded)
-                }
-                mContextModel.devices?.add(item)
             }
         })
 

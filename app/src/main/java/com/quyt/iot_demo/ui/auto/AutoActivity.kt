@@ -4,10 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.databinding.ActivityAutoBinding
-import com.quyt.iot_demo.ui.IfFragment
 
 class AutoActivity : AppCompatActivity() {
     lateinit var mLayoutBinding: ActivityAutoBinding
