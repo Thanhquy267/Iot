@@ -15,6 +15,7 @@ import com.quyt.iot_demo.adapter.ContextDeviceAdapter
 import com.quyt.iot_demo.adapter.ContextDeviceListener
 import com.quyt.iot_demo.data.Api
 import com.quyt.iot_demo.data.SharedPreferenceHelper
+import com.quyt.iot_demo.databinding.DialogContextNameBinding
 import com.quyt.iot_demo.databinding.DialogDeviceStateBinding
 import com.quyt.iot_demo.databinding.FragmentThenBinding
 import com.quyt.iot_demo.model.Context
@@ -26,7 +27,7 @@ class ThenFragment : Fragment(), ContextDeviceListener {
     lateinit var mLayoutBinding: FragmentThenBinding
     lateinit var mActivity: AutoActivity
     private var mListDevice = ArrayList<Device>()
-    private var mSensorAdapter: ContextDeviceAdapter? = null
+    private var mDeviceAdapter: ContextDeviceAdapter? = null
     private var mContextModel = Context()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -43,25 +44,54 @@ class ThenFragment : Fragment(), ContextDeviceListener {
                 mListDevice.add(device)
             }
         }
-        mSensorAdapter = ContextDeviceAdapter(mListDevice, this)
-        mLayoutBinding.rvDevice.adapter = mSensorAdapter
+        mListDevice.forEach {
+            it.state = "OFF"
+        }
+        mDeviceAdapter = ContextDeviceAdapter(mListDevice, this)
+        mLayoutBinding.rvDevice.adapter = mDeviceAdapter
         mLayoutBinding.rvDevice.layoutManager = LinearLayoutManager(requireContext())
         (mLayoutBinding.rvDevice.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         mContextModel.devices = ArrayList()
 
         mLayoutBinding.cvDone.setOnClickListener {
-            Api.request(requireContext(), Api.service.createContext(mContextModel),
-                    success = Consumer {
-                        mActivity.finish()
-                    },
-                    error = Consumer {
-                        Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                    })
+            showContextNameDialog()
         }
     }
 
     override fun onContextDeviceClicked(item: Device?) {
         showCustomDialog(item)
+    }
+
+    fun showContextNameDialog() {
+        val alertDialogBuilder = android.app.AlertDialog.Builder(requireContext())
+        val binding = DataBindingUtil.inflate<DialogContextNameBinding>(
+                LayoutInflater.from(requireContext()),
+                R.layout.dialog_context_name, null, false
+        )
+        alertDialogBuilder.setView(binding.root)
+        val alert = alertDialogBuilder.show()
+        alert.setCancelable(true)
+        alert.setCanceledOnTouchOutside(false)
+        alert?.window?.setBackgroundDrawableResource(R.color.transparent)
+
+        binding.tvCancel.setOnClickListener {
+            alert.dismiss()
+        }
+        binding.tvOk.setOnClickListener {
+            if (binding.etName.text.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), "Tên không được để trống", Toast.LENGTH_SHORT).show()
+            } else {
+                alert.dismiss()
+                mContextModel.name = binding.etName.text.toString()
+                Api.request(requireContext(), Api.service.createContext(mContextModel),
+                        success = Consumer {
+                            mActivity.finish()
+                        },
+                        error = Consumer {
+                            Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                        })
+            }
+        }
     }
 
     private fun showCustomDialog(item: Device?) {
@@ -103,6 +133,8 @@ class ThenFragment : Fragment(), ContextDeviceListener {
                 mContextModel.devices?.remove(itemAdded)
             }
             mContextModel.devices?.add(item)
+            mDeviceAdapter?.changeState(item)
+            mDeviceAdapter
             alert.dismiss()
         }
     }

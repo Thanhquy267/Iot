@@ -46,7 +46,6 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent)
             },
             error = Consumer {
-                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
             })
     }
 }

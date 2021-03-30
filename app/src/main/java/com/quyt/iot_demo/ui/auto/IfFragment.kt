@@ -69,6 +69,7 @@ class IfFragment : Fragment(), ContextSensorListener {
         alert.setCancelable(true)
         alert.setCanceledOnTouchOutside(false)
         alert?.window?.setBackgroundDrawableResource(R.color.transparent)
+        alert?.window?.setLayout(500,500)
         //
         val itemAdded = mContextModel.sensors?.find { it.macAddress == item.macAddress }
         if (itemAdded?.state == "ON") {
@@ -83,6 +84,7 @@ class IfFragment : Fragment(), ContextSensorListener {
                 mContextModel.sensors?.remove(itemAdded)
             }
             mContextModel.sensors?.add(item)
+            mSensorAdapter?.changeState(item)
             alert.dismiss()
         }
     }

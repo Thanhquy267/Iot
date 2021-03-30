@@ -21,12 +21,23 @@ class ContextDeviceAdapter(private val mListDevice: ArrayList<Device>?, val list
     override fun onBindViewHolder(holder: ContextDeviceViewHolder, position: Int) {
         holder.bind(mListDevice?.get(position))
     }
+
+    fun changeState(item: Device) {
+        mListDevice?.forEachIndexed { index, device ->
+            if (device.id == item.id) {
+                device.state = item.state
+//                device.brightness = item.brightness
+                notifyItemChanged(index)
+            }
+        }
+    }
 }
 
 class ContextDeviceViewHolder(val binding: ItemContextDeviceBinding, val listener: ContextDeviceListener) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("ClickableViewAccessibility")
     fun bind(item: Device?) {
         binding.tvTitle.text = item?.name
+        binding.tvState.text = if (item?.state == "ON") "Bật" else "Tắt"
         binding.cvRoot.setOnClickListener {
             listener.onContextDeviceClicked(item)
         }

@@ -23,6 +23,7 @@
                     android:id="@+id/iv_icon"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_centerVertical="true"
                     android:src="@drawable/ic_light_bulb"
                     android:tint="@color/bluef5"/>
 
@@ -30,15 +31,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/iv_icon"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="10dp"
                     android:layout_centerVertical="true"
                     android:orientation="vertical">
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="15sp"
                         android:textStyle="bold"
                         android:textColor="@color/title_text"
+                        android:text="Phòng khách"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/normal_text"
                         android:text="Phòng khách"/>
                 </LinearLayout>
             </RelativeLayout>

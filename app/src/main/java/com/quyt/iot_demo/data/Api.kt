@@ -1,8 +1,11 @@
 package com.quyt.iot_demo.data
 
 import android.content.Context
+import android.widget.Toast
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.quyt.iot_demo.Constant
+import com.quyt.iot_demo.data.response.BaseResponse
 import com.quyt.iot_demo.data.response.DeviceResponse
 import com.quyt.iot_demo.data.response.HomeResponse
 import com.quyt.iot_demo.data.response.LoginResponse
@@ -17,6 +20,7 @@ import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.HttpException
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
@@ -84,13 +88,16 @@ object Api {
         val disposebag = CompositeDisposable()
         val loading = DialogUtils.loading(context)
         disposebag.add(
-                request
-                        .subscribeOn(Schedulers.io()) //(*)
+                request.subscribeOn(Schedulers.io()) //(*)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ result ->
                             success.accept(result)
                             loading.dismiss()
                         }, { e ->
+                            val errorRes = Gson().fromJson((e as HttpException).response()?.errorBody()?.string(), BaseResponse::class.java)
+                            if (!errorRes.errorMessage.isNullOrEmpty()) {
+                                Toast.makeText(context, errorRes.errorMessage, Toast.LENGTH_LONG).show()
+                            }
                             error.accept(e)
                             loading.dismiss()
                         })

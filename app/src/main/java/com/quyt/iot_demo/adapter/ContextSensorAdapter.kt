@@ -21,12 +21,22 @@ class ContextSensorAdapter(private val mListSensor: ArrayList<Device>?, val list
     override fun onBindViewHolder(holder: ContextSensorViewHolder, position: Int) {
         holder.bind(mListSensor?.get(position))
     }
+
+    fun changeState(item: Device) {
+        mListSensor?.forEachIndexed { index, device ->
+            if (device.id == item.id) {
+                device.state = item.state
+                notifyItemChanged(index)
+            }
+        }
+    }
 }
 
 class ContextSensorViewHolder(val binding: ItemContextSensorBinding, val listener: ContextSensorListener) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("ClickableViewAccessibility")
     fun bind(item: Device?) {
         binding.tvTitle.text = item?.name
+        binding.tvState.text = if (item?.state == "ON") "Kích hoạt" else "Không kích hoạt"
         binding.cvRoot.setOnClickListener {
             listener.onContextSensorClicked(item)
         }
