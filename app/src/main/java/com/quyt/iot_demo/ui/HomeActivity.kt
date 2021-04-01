@@ -90,11 +90,14 @@ class HomeActivity : BaseActivity() {
         super.onMessageArrived(topic, message)
         val pushBody = Gson().fromJson(message.toString(), PushMqtt::class.java)
         if (pushBody.clientType == ClientType.SERVER_TYPE.value && pushBody.actionType == ActionType.CHANGE_STATE.value) {
-            if (pushBody.data?.type == "control") {
-                mControlFragment.syncButtonState(pushBody.data)
-            } else {
-                mSensorFragment.changeStatus(pushBody.data)
-            }
+//            if (pushBody.data?.type == "control") {
+//                mControlFragment.syncButtonState(pushBody.data)
+//            } else {
+//                mSensorFragment.changeStatus(pushBody.data)
+//            }
+            val data = pushBody.data
+            mSensorFragment.changeStatus(data)
+            mControlFragment.syncButtonState(data)
         }
     }
 

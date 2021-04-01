@@ -1,55 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <androidx.cardview.widget.CardView
+
+    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/cv_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
         app:cardBackgroundColor="@color/secondary"
-        app:cardCornerRadius="10dp"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        app:cardCornerRadius="10dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true">
+
             <RelativeLayout
                 android:id="@+id/rl_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp">
+
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iv_icon"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_centerVertical="true"
                     android:src="@drawable/ic_sensor"
-                    android:tint="@color/bluef5"/>
+                    android:tint="@color/bluef5" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/iv_icon"
-                    android:layout_marginStart="10dp"
                     android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@id/iv_icon"
                     android:orientation="vertical">
+
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
+                        android:text="Phòng khách"
                         android:textColor="@color/title_text"
                         android:textSize="15sp"
-                        android:text="Phòng khách"/>
+                        android:textStyle="bold" />
+
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_state"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:textSize="13sp"
+                        android:text="Phòng khách"
                         android:textColor="@color/normal_text"
-                        android:text="Phòng khách"/>
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </RelativeLayout>
         </RelativeLayout>

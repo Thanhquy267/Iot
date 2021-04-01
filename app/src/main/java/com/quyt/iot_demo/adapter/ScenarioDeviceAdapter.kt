@@ -9,16 +9,16 @@ import com.quyt.iot_demo.R
 import com.quyt.iot_demo.databinding.ItemContextDeviceBinding
 import com.quyt.iot_demo.model.Device
 
-class ContextDeviceAdapter(private val mListDevice: ArrayList<Device>?, val listener: ContextDeviceListener) : RecyclerView.Adapter<ContextDeviceViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContextDeviceViewHolder {
-        return ContextDeviceViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_context_device, parent, false), listener)
+class ScenarioDeviceAdapter(private val mListDevice: ArrayList<Device>?, val listener: ContextDeviceListener) : RecyclerView.Adapter<ScenarioDeviceViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScenarioDeviceViewHolder {
+        return ScenarioDeviceViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_context_device, parent, false), listener)
     }
 
     override fun getItemCount(): Int {
         return mListDevice?.size ?: 0
     }
 
-    override fun onBindViewHolder(holder: ContextDeviceViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ScenarioDeviceViewHolder, position: Int) {
         holder.bind(mListDevice?.get(position))
     }
 
@@ -33,11 +33,16 @@ class ContextDeviceAdapter(private val mListDevice: ArrayList<Device>?, val list
     }
 }
 
-class ContextDeviceViewHolder(val binding: ItemContextDeviceBinding, val listener: ContextDeviceListener) : RecyclerView.ViewHolder(binding.root) {
+class ScenarioDeviceViewHolder(val binding: ItemContextDeviceBinding, val listener: ContextDeviceListener) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("ClickableViewAccessibility")
     fun bind(item: Device?) {
+        binding.ivIcon.setImageResource(if (item?.type == "control") R.drawable.ic_light_bulb else R.drawable.ic_sensor)
         binding.tvTitle.text = item?.name
-        binding.tvState.text = if (item?.state == "ON") "Bật" else "Tắt"
+        if (item?.type == "control") {
+            binding.tvState.text = if (item.state == "ON") "Bật" + " | " + item.brightness else "Tắt"
+        } else {
+            binding.tvState.text = if (item?.state == "ON") "Bật" else "Tắt"
+        }
         binding.cvRoot.setOnClickListener {
             listener.onContextDeviceClicked(item)
         }

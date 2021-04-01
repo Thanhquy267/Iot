@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.databinding.ActivityAutoBinding
+import com.quyt.iot_demo.ui.auto.createscenario.CreateScenarioActivity
 
 class AutoActivity : AppCompatActivity() {
     lateinit var mLayoutBinding: ActivityAutoBinding
@@ -25,11 +26,13 @@ class AutoActivity : AppCompatActivity() {
         }
 
         mLayoutBinding.cvAdd.setOnClickListener {
-            val fragmentManager = supportFragmentManager
-            val ft = fragmentManager.beginTransaction()
-            ft.replace(R.id.rl_root, IfFragment.newInstance(this), IfFragment().javaClass.simpleName)
-            ft.addToBackStack(IfFragment().javaClass.simpleName)
-            ft.commitAllowingStateLoss()
+//            val fragmentManager = supportFragmentManager
+//            val ft = fragmentManager.beginTransaction()
+//            ft.replace(R.id.rl_root, IfFragment.newInstance(this), IfFragment().javaClass.simpleName)
+//            ft.addToBackStack(IfFragment().javaClass.simpleName)
+//            ft.commitAllowingStateLoss()
+            val intent = Intent(this, CreateScenarioActivity::class.java)
+            startActivity(intent)
         }
     }
 
