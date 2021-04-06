@@ -1,11 +1,10 @@
-package com.quyt.iot_demo.ui.auto
+package com.quyt.iot_demo.ui.scenario
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.databinding.ActivityDoorTrackingBinding
-import com.quyt.iot_demo.databinding.ActivityLocationAutoActionBinding
 
 class DoorTrackingActivity: AppCompatActivity(){
     private lateinit var mLayoutBinding : ActivityDoorTrackingBinding

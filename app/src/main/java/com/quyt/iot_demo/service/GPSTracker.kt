@@ -17,8 +17,8 @@ import com.google.android.gms.maps.model.LatLng
 class GPSTracker(private val mContext: Context?) : Service(), LocationListener {
 
     companion object {
-        const val LOCATION_TIME_INTERVAL = 10000L
-        const val LOCATION_MINIMUM_TOLERANCE = 1000f
+        const val LOCATION_TIME_INTERVAL = 1000L
+        const val LOCATION_MINIMUM_TOLERANCE = 5f
     }
 
     private var isGPSEnabled = false

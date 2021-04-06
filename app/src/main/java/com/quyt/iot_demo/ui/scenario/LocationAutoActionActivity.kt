@@ -1,4 +1,4 @@
-package com.quyt.iot_demo.ui.auto
+package com.quyt.iot_demo.ui.scenario
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

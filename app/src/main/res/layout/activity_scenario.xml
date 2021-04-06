@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+   <RelativeLayout
+       android:id="@+id/rl_root"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:background="@color/primary"
+           android:orientation="vertical">
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="56dp">
+
+               <androidx.appcompat.widget.AppCompatImageView
+                   android:id="@+id/iv_back"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_centerVertical="true"
+                   android:layout_marginStart="20dp"
+                   android:src="@drawable/ic_baseline_arrow_back_ios_new_24"
+                   android:tint="@color/title_text" />
+
+               <androidx.appcompat.widget.AppCompatTextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_centerInParent="true"
+                   android:layout_marginStart="10dp"
+                   android:text="Tính năng tự động"
+                   android:textColor="@color/title_text"
+                   android:textSize="17sp" />
+
+               <androidx.appcompat.widget.AppCompatImageView
+                   android:id="@+id/iv_add"
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
+                   android:layout_centerVertical="true"
+                   android:layout_marginEnd="20dp"
+                   android:layout_alignParentEnd="true"
+                   android:src="@drawable/ic_baseline_add_24"
+                   android:tint="@color/title_text" />
+           </RelativeLayout>
+
+           <androidx.recyclerview.widget.RecyclerView
+               android:id="@+id/rv_scenario"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               tools:listitem="@layout/item_scenario"/>
+       </LinearLayout>
+   </RelativeLayout>
+</layout>

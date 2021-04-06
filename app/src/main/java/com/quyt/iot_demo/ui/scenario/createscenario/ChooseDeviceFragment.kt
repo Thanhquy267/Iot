@@ -1,4 +1,4 @@
-package com.quyt.iot_demo.ui.auto
+package com.quyt.iot_demo.ui.scenario.createscenario
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,9 +15,7 @@ import com.quyt.iot_demo.adapter.ScenarioDeviceAdapter
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.DialogDeviceStateBinding
 import com.quyt.iot_demo.databinding.FragmentChooseDeviceBinding
-import com.quyt.iot_demo.model.Context
 import com.quyt.iot_demo.model.Device
-import com.quyt.iot_demo.ui.auto.createscenario.CreateScenarioActivity
 
 class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
     private val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(requireContext()) }
@@ -25,7 +23,6 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
     lateinit var mActivity: CreateScenarioActivity
     private var mListSensor = ArrayList<Device>()
     private var mSensorAdapter: ScenarioDeviceAdapter? = null
-    private var mContextModel = Context()
     private var mIsInput = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -51,7 +48,6 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
         mLayoutBinding.rvSensor.adapter = mSensorAdapter
         mLayoutBinding.rvSensor.layoutManager = LinearLayoutManager(requireContext())
         (mLayoutBinding.rvSensor.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        mContextModel.sensors = ArrayList()
 
     }
 
@@ -88,7 +84,7 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
             }
         })
 
-        binding.rgSensorState.setOnCheckedChangeListener { group, checkedId ->
+        binding.rgSensorState.setOnCheckedChangeListener { _, checkedId ->
             item.state = if (checkedId == R.id.rb_on) "ON" else "OFF"
             if (mIsInput) {
                 mActivity.addInput(item)
@@ -108,7 +104,8 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
 
     companion object {
         fun newInstance(activity: CreateScenarioActivity, isInput: Boolean = true): ChooseDeviceFragment {
-            val fragment = ChooseDeviceFragment()
+            val fragment =
+                ChooseDeviceFragment()
             fragment.mActivity = activity
             fragment.mIsInput = isInput
             return fragment

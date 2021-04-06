@@ -33,13 +33,14 @@ class LocationService : BaseLocationService() {
         //
         val homeLocation = Location("homeLocation")
         val crLocation = Location("currentLocation")
-        crLocation.latitude = location?.latitude?:0.0
-        crLocation.longitude = location?.longitude?:0.0
-        homeLocation.latitude =  mSharedPreference.currentHome?.geom?.coordinates?.get(0)?:0.0
-        homeLocation.longitude = mSharedPreference.currentHome?.geom?.coordinates?.get(1)?:0.0
+        crLocation.latitude = location?.latitude ?: 0.0
+        crLocation.longitude = location?.longitude ?: 0.0
+        homeLocation.latitude = mSharedPreference.currentHome?.geom?.coordinates?.get(0) ?: 0.0
+        homeLocation.longitude = mSharedPreference.currentHome?.geom?.coordinates?.get(1) ?: 0.0
         val distance = crLocation.distanceTo(homeLocation)
-        Log.d("DistanceCrToHome",distance.toString())
-        if (distance < 100){
+        Log.d("DistanceCrToHome", distance.toString())
+        mSharedPreference.currentLocation = crLocation
+        if (distance < 100) {
             Notification.createNotification(this)
         }
     }

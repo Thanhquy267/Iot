@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.gson.Gson
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.adapter.DeviceAdapter
@@ -23,7 +24,7 @@ import com.quyt.iot_demo.mqtt.MQTTClient
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
 
-class ControlFragment : Fragment(), OnDeviceListener {
+class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefreshListener {
     lateinit var mLayoutBinding: FragmentControlBinding
     lateinit var mActivity: HomeActivity
     private var mListDevice = ArrayList<Device>()
@@ -37,10 +38,8 @@ class ControlFragment : Fragment(), OnDeviceListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mDeviceAdapter = DeviceAdapter(mListDevice, this)
-        mLayoutBinding.rvDevice.adapter = mDeviceAdapter
-        mLayoutBinding.rvDevice.layoutManager = LinearLayoutManager(requireContext())
-        (mLayoutBinding.rvDevice.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        initRecyclerView()
+        initSwipeToRefreshLayout()
     }
 
 
@@ -101,6 +100,27 @@ class ControlFragment : Fragment(), OnDeviceListener {
                     }
                 })
     }
+
+    override fun onRefresh() {
+
+    }
+
+    private fun initRecyclerView(){
+        mDeviceAdapter = DeviceAdapter(mListDevice, this)
+        mLayoutBinding.rvDevice.adapter = mDeviceAdapter
+        mLayoutBinding.rvDevice.layoutManager = LinearLayoutManager(requireContext())
+        (mLayoutBinding.rvDevice.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+    }
+
+
+    private fun initSwipeToRefreshLayout() {
+        mLayoutBinding.swipeContainer.setOnRefreshListener(this)
+        mLayoutBinding.swipeContainer.setColorSchemeResources(R.color.bluef5,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark)
+    }
+
 
 
     fun syncButtonState(device: Device?) {

@@ -2,11 +2,9 @@ package com.quyt.iot_demo.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.location.Location
 import android.preference.PreferenceManager
-import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.Home
 import com.quyt.iot_demo.model.User
 
@@ -15,15 +13,15 @@ import com.quyt.iot_demo.model.User
  * @author Sang
  */
 class SharedPreferenceHelper private constructor(
-    private val context: Context,
-    private val gson: Gson
+        private val context: Context,
+        private val gson: Gson
 ) {
     /**
      * get current doing preference
      * @return
      */
     private val preference: SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
+            PreferenceManager.getDefaultSharedPreferences(context)
 //    private val gson: Gson? = null
 
     //    var selectedAvatarBitmapPath: String
@@ -64,6 +62,24 @@ class SharedPreferenceHelper private constructor(
             PreferenceUtils.saveToPrefs(context, HOME, Gson().toJson(value))
         }
 
+    var currentLocation: Location?
+        get() {
+            val str = PreferenceUtils.getFromPrefs(context, USER_LOCATION_KEY, "User Location,0,0") as String
+            val arr = str.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            if (arr.size < 3) return null
+            val location = Location(arr[0])
+            location.latitude = java.lang.Double.parseDouble(arr[1])
+            location.longitude = java.lang.Double.parseDouble(arr[2])
+            return location
+        }
+        set(value) {
+            val lat = value?.latitude
+            val lng = value?.longitude
+            val provider = value?.provider
+            val str = "$provider,$lat,$lng"
+            PreferenceUtils.saveToPrefs(context, USER_LOCATION_KEY, str)
+        }
+
     /**
      * support get value from key
      * @return
@@ -84,6 +100,7 @@ class SharedPreferenceHelper private constructor(
         private const val USER = "USER"
         private const val ISLOGGING = "ISLOGGING"
         private const val HOME = "HOME"
+        private const val USER_LOCATION_KEY = "USER_LOCATION_KEY"
 
         /**
          * get settings instance

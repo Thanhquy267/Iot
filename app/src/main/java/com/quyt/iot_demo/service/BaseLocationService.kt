@@ -287,7 +287,7 @@ open class BaseLocationService : Service() {
                 it.description = "Endless Service channel"
                 it.enableLights(true)
                 it.lightColor = Color.RED
-                it.enableVibration(true)
+                it.enableVibration(false)
                 it.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
                 it
             }
@@ -315,8 +315,8 @@ open class BaseLocationService : Service() {
 
     companion object {
         const val TAG = "BaseLocationService"
-        private const val LOCATION_INTERVAL = 5000
-        private const val LOCATION_DISTANCE = 30f
+        private const val LOCATION_INTERVAL = 1000
+        private const val LOCATION_DISTANCE = 5f
     }
 }
 

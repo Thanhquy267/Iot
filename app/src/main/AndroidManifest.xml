@@ -28,8 +28,8 @@
         <activity android:name=".ui.MainActivity" />
         <activity android:name=".ui.HomeActivity"/>
         <activity android:name=".ui.WebMapActivity" />
-        <activity android:name=".ui.auto.AutoActivity" />
-        <activity android:name=".ui.auto.LocationAutoActionActivity" />
+        <activity android:name=".ui.scenario.ScenarioActivity" />
+        <activity android:name=".ui.scenario.LocationAutoActionActivity" />
         <activity android:name=".ui.add.AddDeviceActivity" />
         <activity android:name=".ui.auth.LoginActivity">
             <intent-filter>
@@ -38,7 +38,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.auto.createscenario.CreateScenarioActivity" />
+        <activity android:name=".ui.scenario.createscenario.CreateScenarioActivity" />
+        <activity android:name=".ui.location.MapActivity" />
 
         <service
             android:name=".TimerJobService"
@@ -50,6 +51,11 @@
 
         <service android:name="org.eclipse.paho.android.service.MqttService">
         </service>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD1LSINr9CWJD4tE02TuO3SXkpSdMc5cm0" />
+
     </application>
 
 </manifest>

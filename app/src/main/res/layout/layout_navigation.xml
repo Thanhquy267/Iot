@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -9,8 +10,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_margin="20dp">
+            android:layout_margin="20dp"
+            android:gravity="center_vertical">
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_home_name"
                 android:layout_width="wrap_content"
@@ -24,7 +26,7 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="5dp"
                 android:src="@drawable/ic_baseline_arrow_drop_down_24"
-                android:tint="@color/title_text"/>
+                android:tint="@color/title_text" />
         </LinearLayout>
 
         <View
@@ -38,52 +40,62 @@
             android:id="@+id/ll_location"
             style="@style/clickableCard"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_home"
-                android:tint="@color/bluef5" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_home"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:text="Vị trí nhà riêng"
-                android:textColor="@color/title_text"
-                android:textSize="17sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_home"
+                    android:tint="@color/bluef5" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_home"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:text="Vị trí nhà riêng"
+                    android:textColor="@color/title_text"
+                    android:textSize="17sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_auto"
             style="@style/clickableCard"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_automation"
-                android:tint="@color/bluef5" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_auto"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:text="Tính năng tự động"
-                android:textColor="@color/title_text"
-                android:textSize="17sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_automation"
+                    android:tint="@color/bluef5" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_auto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:text="Tính năng tự động"
+                    android:textColor="@color/title_text"
+                    android:textSize="17sp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </layout>

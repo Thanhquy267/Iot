@@ -18,4 +18,7 @@ class User {
     @SerializedName("updatedAt")
     var updatedAt: String? = null
 
+    @SerializedName("token")
+    var token: String? = null
+
 }

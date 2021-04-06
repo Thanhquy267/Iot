@@ -1,5 +1,6 @@
 package com.quyt.iot_demo.ui
 
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -26,7 +27,8 @@ import com.quyt.iot_demo.service.LocationService
 import com.quyt.iot_demo.service.ServiceState
 import com.quyt.iot_demo.service.getServiceState
 import com.quyt.iot_demo.ui.add.AddDeviceActivity
-import com.quyt.iot_demo.ui.auto.AutoActivity
+import com.quyt.iot_demo.ui.scenario.ScenarioActivity
+import com.quyt.iot_demo.ui.location.MapActivity
 import io.reactivex.functions.Consumer
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
@@ -55,10 +57,12 @@ class HomeActivity : BaseActivity() {
         window?.statusBarColor = ContextCompat.getColor(this, R.color.primary)
         //
         mLayoutBinding.layoutNavigation.llLocation.setOnClickListener {
-            showCustomDialog()
+//            showCustomDialog()
+            val intent = Intent(this, MapActivity::class.java)
+            startActivity(intent)
         }
         mLayoutBinding.layoutNavigation.llAuto.setOnClickListener {
-            val intent = Intent(this, AutoActivity::class.java)
+            val intent = Intent(this, ScenarioActivity::class.java)
             startActivity(intent)
         }
         mLayoutBinding.view.ivAdd.setOnClickListener {
@@ -74,7 +78,9 @@ class HomeActivity : BaseActivity() {
 //                mLayoutBinding.view.scLivingRoom.performClick()
 //            }, 500)
 //        }
-//        actionOnService(Actions.START)
+//        if (!isLocationServiceRunning()) {
+//            actionOnService(Actions.START)
+//        }
     }
 
     override fun onResume() {
@@ -83,7 +89,7 @@ class HomeActivity : BaseActivity() {
     }
 
     override fun onConnectSuccess() {
-        getHome()
+//        getHome()
     }
 
     override fun onMessageArrived(topic: String?, message: MqttMessage?) {
@@ -111,7 +117,7 @@ class HomeActivity : BaseActivity() {
     }
 
     private fun getHome() {
-        Api.request(this, Api.service.getHome(mSharedPreference.currentUser?.id ?: 0),
+        Api.request(this, Api.service.getHome(),
                 Consumer { result ->
                     mCurrentHome = result.data?.firstOrNull()
                     mListDevice.clear()
@@ -173,6 +179,16 @@ class HomeActivity : BaseActivity() {
         } catch (e: UnsupportedEncodingException) {
             throw IllegalArgumentException("the charset is invalid")
         }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun isLocationServiceRunning(): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        manager.getRunningServices(Int.MAX_VALUE).forEach {
+            if (LocationService::class.java.name == it.service.className)
+                return true
+        }
+        return false
     }
 
     private fun actionOnService(action: Actions) {
