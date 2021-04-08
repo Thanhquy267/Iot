@@ -92,6 +92,10 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
                 mActivity.addOutput(item)
             }
             alert.dismiss()
+            val fm = mActivity.supportFragmentManager.findFragmentByTag(SelectScenarioTypeFragment().javaClass.simpleName)
+            if ( fm != null){
+                mActivity.supportFragmentManager.beginTransaction().remove(fm).commit()
+            }
             mActivity.supportFragmentManager.popBackStack()
         }
     }

@@ -22,17 +22,26 @@ class SensorAdapter(private val mListSensor: ArrayList<Device>?) : RecyclerView.
         holder.bind(mListSensor?.get(position))
     }
 
-    fun updateStatus(device: Device?){
-        val deviceNeedUpdate =  mListSensor?.find {
+    fun updateStatus(device: Device?) {
+        val deviceNeedUpdate = mListSensor?.find {
             it.macAddress == device?.macAddress
         }
         val pos = mListSensor?.indexOf(deviceNeedUpdate)
         deviceNeedUpdate?.state = device?.state
-        if (deviceNeedUpdate!= null){
-            mListSensor?.set(pos?:0,deviceNeedUpdate)
-            notifyItemChanged(pos?:0)
+        if (deviceNeedUpdate != null) {
+            mListSensor?.set(pos ?: 0, deviceNeedUpdate)
+            notifyItemChanged(pos ?: 0)
         }
     }
+
+    fun setData(listData: ArrayList<Device>) {
+        mListSensor?.clear()
+        ArrayList(listData).forEach {
+            mListSensor?.add(it)
+        }
+        notifyDataSetChanged()
+    }
+
 }
 
 class SensorViewHolder(val binding: ItemSensorBinding) : RecyclerView.ViewHolder(binding.root) {

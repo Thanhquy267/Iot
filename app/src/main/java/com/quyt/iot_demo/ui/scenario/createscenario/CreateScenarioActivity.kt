@@ -1,5 +1,6 @@
 package com.quyt.iot_demo.ui.scenario.createscenario
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -16,6 +17,7 @@ import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityCreateScenarioBinding
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.Scenario
+import com.quyt.iot_demo.ui.HomeActivity
 import io.reactivex.functions.Consumer
 
 class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
@@ -108,8 +110,8 @@ class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
             )
             ft.replace(
                     R.id.rl_root,
-                    ChooseDeviceFragment.newInstance(this),
-                    ChooseDeviceFragment().javaClass.simpleName
+                    SelectScenarioTypeFragment.newInstance(this),
+                    SelectScenarioTypeFragment().javaClass.simpleName
             )
             ft.addToBackStack(ChooseDeviceFragment().javaClass.simpleName)
             ft.commitAllowingStateLoss()
@@ -120,12 +122,6 @@ class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
         mLayoutBinding.cvAddOutput.setOnClickListener {
             val fragmentManager = supportFragmentManager
             val ft = fragmentManager.beginTransaction()
-            ft.setCustomAnimations(
-                    R.anim.slide_in_left,
-                    R.anim.slide_out_left,
-                    R.anim.slide_in_right,
-                    R.anim.slide_out_right
-            )
             ft.replace(
                     R.id.rl_root,
                     ChooseDeviceFragment.newInstance(this, false),

@@ -108,8 +108,8 @@ class HomeActivity : BaseActivity() {
     }
 
     private fun initViewPager() {
-        mControlFragment = ControlFragment.newInstance(this, mListDevice, mMqttClient)
-        mSensorFragment = SensorFragment.newInstance(this, mListSensor, mMqttClient)
+        mControlFragment = ControlFragment.newInstance(this, mMqttClient)
+        mSensorFragment = SensorFragment.newInstance(this, mMqttClient)
         val adapter = MainPagerAdapter(supportFragmentManager)
         adapter.addFrag(mControlFragment, "Device")
         adapter.addFrag(mSensorFragment, "Sensor")

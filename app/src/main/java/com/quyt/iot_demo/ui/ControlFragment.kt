@@ -15,24 +15,29 @@ import com.google.gson.Gson
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.adapter.DeviceAdapter
 import com.quyt.iot_demo.adapter.OnDeviceListener
+import com.quyt.iot_demo.data.Api
+import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.FragmentControlBinding
 import com.quyt.iot_demo.model.ActionType
 import com.quyt.iot_demo.model.ClientType
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.PushMqtt
 import com.quyt.iot_demo.mqtt.MQTTClient
+import io.reactivex.functions.Consumer
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
 
 class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefreshListener {
+    private val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(requireContext()) }
     lateinit var mLayoutBinding: FragmentControlBinding
     lateinit var mActivity: HomeActivity
     private var mListDevice = ArrayList<Device>()
     private var mDeviceAdapter: DeviceAdapter? = null
     private var mMqttClient: MQTTClient? = null
+    private var mHomeId = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mLayoutBinding =  DataBindingUtil.inflate(inflater, R.layout.fragment_control, container, false)
+        mLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_control, container, false)
         return mLayoutBinding.root
     }
 
@@ -40,6 +45,7 @@ class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefre
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
         initSwipeToRefreshLayout()
+        getDevices()
     }
 
 
@@ -102,16 +108,15 @@ class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefre
     }
 
     override fun onRefresh() {
-
+        getDevices()
     }
 
-    private fun initRecyclerView(){
-        mDeviceAdapter = DeviceAdapter(mListDevice, this)
+    private fun initRecyclerView() {
+        mDeviceAdapter = DeviceAdapter(ArrayList(), this)
         mLayoutBinding.rvDevice.adapter = mDeviceAdapter
         mLayoutBinding.rvDevice.layoutManager = LinearLayoutManager(requireContext())
         (mLayoutBinding.rvDevice.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
-
 
     private fun initSwipeToRefreshLayout() {
         mLayoutBinding.swipeContainer.setOnRefreshListener(this)
@@ -121,17 +126,31 @@ class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefre
                 android.R.color.holo_blue_dark)
     }
 
-
+    private fun getDevices() {
+        mLayoutBinding.swipeContainer.isRefreshing = true
+        Api.request(requireContext(), Api.service.getDevice(mSharedPreference.currentHome?.id
+                ?: 0, "control"),
+                Consumer {
+                    mListDevice.clear()
+                    it.data?.forEach { device ->
+                        mListDevice.add(device)
+                    }
+                    mDeviceAdapter?.setData(mListDevice)
+                    mLayoutBinding.swipeContainer.isRefreshing = false
+                },
+                Consumer {
+                    mLayoutBinding.swipeContainer.isRefreshing = false
+                }, false)
+    }
 
     fun syncButtonState(device: Device?) {
         mDeviceAdapter?.updateStatus(device)
     }
 
     companion object {
-        fun newInstance(activity: HomeActivity, listDevice: ArrayList<Device>,mMqttClient : MQTTClient): ControlFragment {
+        fun newInstance(activity: HomeActivity, mMqttClient: MQTTClient): ControlFragment {
             val fragment = ControlFragment()
             fragment.mActivity = activity
-            fragment.mListDevice = listDevice
             fragment.mMqttClient = mMqttClient
             return fragment
         }

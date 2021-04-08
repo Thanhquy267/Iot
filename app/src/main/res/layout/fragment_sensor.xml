@@ -6,12 +6,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_sensor"
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            app:layout_behavior=".custom.OverScrollBounceBehavior" />
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_sensor"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                app:layout_behavior=".custom.OverScrollBounceBehavior" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
     </RelativeLayout>
 </layout>

@@ -1,5 +1,6 @@
 package com.quyt.iot_demo.data
 
+import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
 import com.google.gson.Gson
@@ -92,25 +93,39 @@ object Api {
                 @Body scenario: Scenario
         ): Observable<ScenarioResponse>
 
+        @GET("/device/{homeId}")
+        fun getDevice(
+                @Path("homeId") homeId: Int,
+                @Query("type") type: String
+        ): Observable<DeviceResponse>
+
     }
 
     fun <T> request(
             context: Context,
             request: Observable<T>,
             success: Consumer<T>,
-            error: Consumer<Throwable>
+            error: Consumer<Throwable>,
+            showLoading: Boolean = true
     ) {
         val disposebag = CompositeDisposable()
-        val loading = DialogUtils.loading(context)
+        var loading: AlertDialog? = null
+        if (showLoading) {
+            loading = DialogUtils.loading(context)
+        }
         disposebag.add(
                 request.subscribeOn(Schedulers.io()) //(*)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ result ->
                             success.accept(result)
-                            loading.dismiss()
+                            if (showLoading) {
+                                loading?.dismiss()
+                            }
                         }, { e ->
                             try {
-                                loading.dismiss()
+                                if (showLoading) {
+                                    loading?.dismiss()
+                                }
                                 val errorRes = Gson().fromJson(
                                         (e as? HttpException)?.response()?.errorBody()?.string(),
                                         BaseResponse::class.java

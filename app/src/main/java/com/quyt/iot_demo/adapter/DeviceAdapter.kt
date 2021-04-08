@@ -1,19 +1,20 @@
 package com.quyt.iot_demo.adapter
 
 import android.annotation.SuppressLint
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.databinding.ItemDeviceBinding
 import com.quyt.iot_demo.model.Device
 
-class DeviceAdapter(private val mListDevice: ArrayList<Device>?,val listener: OnDeviceListener) : RecyclerView.Adapter<DeviceViewHolder>() {
+class DeviceAdapter(private val mListDevice: ArrayList<Device>?, val listener: OnDeviceListener) : RecyclerView.Adapter<DeviceViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
-        return DeviceViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_device, parent, false),listener)
+        return DeviceViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_device, parent, false), listener)
     }
 
     override fun getItemCount(): Int {
@@ -24,39 +25,47 @@ class DeviceAdapter(private val mListDevice: ArrayList<Device>?,val listener: On
         holder.bind(mListDevice?.get(position))
     }
 
-    fun updateStatus(device: Device?){
-        val deviceNeedUpdate =  mListDevice?.find {
+    fun setData(listData: ArrayList<Device>) {
+        mListDevice?.clear()
+        ArrayList(listData).forEach {
+            mListDevice?.add(it)
+        }
+        notifyDataSetChanged()
+    }
+
+    fun updateStatus(device: Device?) {
+        val deviceNeedUpdate = mListDevice?.find {
             it.macAddress == device?.macAddress
         }
         val pos = mListDevice?.indexOf(deviceNeedUpdate)
         deviceNeedUpdate?.state = device?.state
-        if (deviceNeedUpdate!= null){
-            mListDevice?.set(pos?:0,deviceNeedUpdate)
-            notifyItemChanged(pos?:0)
+        if (deviceNeedUpdate != null) {
+            mListDevice?.set(pos ?: 0, deviceNeedUpdate)
+            notifyItemChanged(pos ?: 0)
         }
     }
 }
 
-class DeviceViewHolder(val binding: ItemDeviceBinding,val listener: OnDeviceListener) : RecyclerView.ViewHolder(binding.root) {
+class DeviceViewHolder(val binding: ItemDeviceBinding, val listener: OnDeviceListener) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("ClickableViewAccessibility")
     fun bind(item: Device?) {
         binding.tvTitle.text = item?.name
         binding.scSwitch.isChecked = item?.state == "ON"
-        binding.sbBrightness.progress = item?.brightness?:0
+        binding.sbBrightness.progress = item?.brightness ?: 0
         binding.scSwitch.setOnCheckedChangeListener { _, isChecked ->
-             item?.state = if(isChecked) "ON" else "OFF"
-             listener.onDeviceStateChange(item,binding.scSwitch.isPressed)
+            item?.state = if (isChecked) "ON" else "OFF"
+            listener.onDeviceStateChange(item, binding.scSwitch.isPressed)
         }
 //        binding.cvRoot.setOnClickListener {
 //            binding.llBrightness.visibility = if(binding.llBrightness.visibility == View.GONE) View.VISIBLE else View.GONE
 //        }
 
 
-        val param = FrameLayout.LayoutParams(30,ViewGroup.LayoutParams.MATCH_PARENT)
+        val param = FrameLayout.LayoutParams(30, ViewGroup.LayoutParams.MATCH_PARENT)
         param.gravity = Gravity.START
 
         var prog = 0
-        binding.sbBrightness.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
+        binding.sbBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 prog = progress
             }
@@ -104,8 +113,8 @@ class DeviceViewHolder(val binding: ItemDeviceBinding,val listener: OnDeviceList
 //    }
 }
 
-interface  OnDeviceListener {
-     fun onDeviceStateChange(device: Device?,isClick : Boolean)
-     fun onItemClicked(device: Device?)
-     fun onBrightnessChange(device: Device?)
+interface OnDeviceListener {
+    fun onDeviceStateChange(device: Device?, isClick: Boolean)
+    fun onItemClicked(device: Device?)
+    fun onBrightnessChange(device: Device?)
 }
