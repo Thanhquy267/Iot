@@ -145,11 +145,11 @@ class HomeActivity : BaseActivity() {
     private fun subscribeButtonState() {
         if (mMqttClient.isConnected()) {
             mMqttClient.subscribe(
-                    "1",
+                    mSharedPreference.currentUser?.id.toString(),
                     1,
                     object : IMqttActionListener {
                         override fun onSuccess(asyncActionToken: IMqttToken?) {
-                            Log.d("MQTTClient", "Subscribe button state success")
+                            Log.d("MQTTClient", "Subscribe button state success ${mSharedPreference.currentUser?.id}")
                         }
 
                         override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
