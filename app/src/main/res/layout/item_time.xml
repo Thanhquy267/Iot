@@ -7,7 +7,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minWidth="40dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:background="@color/primary">
 
         <RelativeLayout
             android:id="@+id/rl_top_view"
@@ -22,7 +23,7 @@
             android:textAlignment="center"
             android:layout_gravity="center"
             android:layout_marginBottom="5dp"
-            android:textColor="@color/greyae"
+            android:textColor="@color/normal_text"
             android:textSize="35sp"
             tools:text="24" />
 

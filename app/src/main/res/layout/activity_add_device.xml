@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <LinearLayout
 
         android:layout_width="match_parent"
@@ -26,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginStart="10dp"
-                android:text="Thêm thiết bị"
+                android:text="@string/add_device_title"
                 android:textColor="@color/title_text"
                 android:textSize="17sp" />
         </RelativeLayout>
@@ -48,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/title_text"
                     android:textSize="17sp"
-                    android:text="WIFI:"/>
+                    android:text="@string/wifi"/>
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tv_wifi"
                     android:layout_width="wrap_content"
@@ -56,7 +57,7 @@
                     android:layout_marginStart="5dp"
                     android:textColor="@color/normal_text"
                     android:textSize="17sp"
-                    android:text="..."/>
+                    tools:text="..."/>
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -65,7 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:textColorHint="@color/normal_text"
                 app:passwordToggleEnabled="true">
 
@@ -93,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Thêm"
+                android:text="@string/add"
                 android:textColor="@color/white"
                 android:textSize="17sp" />
         </androidx.cardview.widget.CardView>

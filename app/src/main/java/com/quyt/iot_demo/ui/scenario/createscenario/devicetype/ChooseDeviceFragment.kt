@@ -1,4 +1,4 @@
-package com.quyt.iot_demo.ui.scenario.createscenario
+package com.quyt.iot_demo.ui.scenario.createscenario.devicetype
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +16,8 @@ import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.DialogDeviceStateBinding
 import com.quyt.iot_demo.databinding.FragmentChooseDeviceBinding
 import com.quyt.iot_demo.model.Device
+import com.quyt.iot_demo.ui.scenario.createscenario.CreateScenarioActivity
+import com.quyt.iot_demo.ui.scenario.createscenario.SelectScenarioTypeFragment
 
 class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
     private val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(requireContext()) }
@@ -109,7 +111,7 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
     companion object {
         fun newInstance(activity: CreateScenarioActivity, isInput: Boolean = true): ChooseDeviceFragment {
             val fragment =
-                ChooseDeviceFragment()
+                    ChooseDeviceFragment()
             fragment.mActivity = activity
             fragment.mIsInput = isInput
             return fragment

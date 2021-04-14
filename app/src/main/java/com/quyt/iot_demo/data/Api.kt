@@ -93,6 +93,11 @@ object Api {
                 @Body scenario: Scenario
         ): Observable<ScenarioResponse>
 
+        @PUT("/scenario/{scenarioId}/delete")
+        fun deleteScenario(
+                @Path("scenarioId") scenarioId: Int
+        ): Observable<BaseResponse>
+
         @GET("/device/{homeId}")
         fun getDevice(
                 @Path("homeId") homeId: Int,
@@ -129,7 +134,7 @@ object Api {
                                 val errorRes = Gson().fromJson(
                                         (e as? HttpException)?.response()?.errorBody()?.string(),
                                         BaseResponse::class.java
-                                )
+                                ) ?: return@subscribe
                                 if (!errorRes.errorMessage.isNullOrEmpty()) {
                                     Toast.makeText(context, errorRes.errorMessage, Toast.LENGTH_LONG).show()
                                 }

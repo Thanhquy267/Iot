@@ -20,6 +20,12 @@ class ScenarioAdapter(private var mListScenario: ArrayList<Scenario?>?, val list
     override fun onBindViewHolder(holder: ScenarioViewHolder, position: Int) {
         return holder.bind(mListScenario?.get(position))
     }
+
+    fun deleteScenario(scenario: Scenario?) {
+        val pos = mListScenario?.indexOf(scenario)
+        mListScenario?.remove(scenario)
+        notifyItemRemoved(pos ?: 0)
+    }
 }
 
 class ScenarioViewHolder(val binding: ItemScenarioBinding, val listener: OnScenarioListener) : RecyclerView.ViewHolder(binding.root) {
@@ -28,6 +34,10 @@ class ScenarioViewHolder(val binding: ItemScenarioBinding, val listener: OnScena
         binding.scActive.isChecked = scenario?.isActivate ?: false
         binding.cvRoot.setOnClickListener {
             listener.onItemClicked(scenario)
+        }
+        binding.cvRoot.setOnLongClickListener {
+            listener.onItemLongClicked(scenario)
+            return@setOnLongClickListener true
         }
         binding.scActive.setOnCheckedChangeListener { _, isChecked ->
             scenario?.isActivate = isChecked
@@ -38,5 +48,6 @@ class ScenarioViewHolder(val binding: ItemScenarioBinding, val listener: OnScena
 
 interface OnScenarioListener {
     fun onItemClicked(scenario: Scenario?)
+    fun onItemLongClicked(scenario: Scenario?)
     fun onStateChange(scenario: Scenario?)
 }

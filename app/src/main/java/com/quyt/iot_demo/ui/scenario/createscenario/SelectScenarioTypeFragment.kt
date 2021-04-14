@@ -8,6 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.databinding.FragmentSelectScenarioTypeBinding
+import com.quyt.iot_demo.ui.scenario.createscenario.devicetype.ChooseDeviceFragment
+import com.quyt.iot_demo.ui.scenario.createscenario.timetype.ChooseTimeFragment
 
 class SelectScenarioTypeFragment : Fragment() {
     lateinit var mLayoutBinding: FragmentSelectScenarioTypeBinding
@@ -36,7 +38,15 @@ class SelectScenarioTypeFragment : Fragment() {
 
         }
         mLayoutBinding.cvTime.setOnClickListener {
-
+            val fragmentManager = mActivity.supportFragmentManager
+            val ft = fragmentManager.beginTransaction()
+            ft.add(
+                    R.id.rl_root,
+                    ChooseTimeFragment.newInstance(mActivity),
+                    ChooseTimeFragment().javaClass.simpleName
+            )
+            ft.addToBackStack(ChooseTimeFragment().javaClass.simpleName)
+            ft.commitAllowingStateLoss()
         }
         mLayoutBinding.cvDevice.setOnClickListener {
             val fragmentManager = mActivity.supportFragmentManager

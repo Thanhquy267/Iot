@@ -1,6 +1,5 @@
 package com.quyt.iot_demo.ui.scenario.createscenario
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -17,7 +16,7 @@ import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityCreateScenarioBinding
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.Scenario
-import com.quyt.iot_demo.ui.HomeActivity
+import com.quyt.iot_demo.ui.scenario.createscenario.devicetype.ChooseDeviceFragment
 import io.reactivex.functions.Consumer
 
 class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
