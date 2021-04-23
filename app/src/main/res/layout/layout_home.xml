@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/ll_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -9,6 +9,7 @@
         android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/rl_actionbar"
             android:layout_width="match_parent"
             android:layout_height="56dp">
 
@@ -56,7 +57,15 @@
          <androidx.viewpager.widget.ViewPager
              android:id="@+id/vp_main"
              android:layout_width="match_parent"
-             android:layout_height="match_parent"/>
+             android:layout_height="match_parent"
+             android:layout_below="@id/rl_actionbar"
+             android:layout_above="@id/tl_bottom"/>
 
-    </LinearLayout>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tl_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
 </layout>

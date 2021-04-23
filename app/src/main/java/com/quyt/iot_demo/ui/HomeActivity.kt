@@ -47,6 +47,7 @@ class HomeActivity : BaseActivity() {
     private var mCurrentHome: Home? = null
     private lateinit var mControlFragment: ControlFragment
     private lateinit var mSensorFragment: SensorFragment
+    private lateinit var mIRFragment: IRFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,10 +111,13 @@ class HomeActivity : BaseActivity() {
     private fun initViewPager() {
         mControlFragment = ControlFragment.newInstance(this, mMqttClient)
         mSensorFragment = SensorFragment.newInstance(this, mMqttClient)
+        mIRFragment = IRFragment()
         val adapter = MainPagerAdapter(supportFragmentManager)
         adapter.addFrag(mControlFragment, "Device")
         adapter.addFrag(mSensorFragment, "Sensor")
+        adapter.addFrag(mIRFragment, "IR")
         mLayoutBinding.view.vpMain.adapter = adapter
+        mLayoutBinding.view.tlBottom.setupWithViewPager(mLayoutBinding.view.vpMain)
     }
 
     private fun getHome() {

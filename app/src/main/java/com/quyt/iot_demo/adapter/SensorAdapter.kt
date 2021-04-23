@@ -1,8 +1,10 @@
 package com.quyt.iot_demo.adapter
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.quyt.iot_demo.R
@@ -48,6 +50,7 @@ class SensorViewHolder(val binding: ItemSensorBinding) : RecyclerView.ViewHolder
     @SuppressLint("ClickableViewAccessibility")
     fun bind(item: Device?) {
         binding.tvTitle.text = item?.name
-        binding.scSwitch.isChecked = item?.state == "ON"
+        binding.ivIcon.imageTintList = if (item?.state == "ON") ColorStateList.valueOf(ContextCompat.getColor(binding.root.context,R.color.bluef5))
+        else ColorStateList.valueOf(ContextCompat.getColor(binding.root.context,R.color.normal_text))
     }
 }
