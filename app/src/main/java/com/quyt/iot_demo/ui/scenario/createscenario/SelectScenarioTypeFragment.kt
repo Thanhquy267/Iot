@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.databinding.FragmentSelectScenarioTypeBinding
 import com.quyt.iot_demo.ui.scenario.createscenario.devicetype.ChooseDeviceFragment
+import com.quyt.iot_demo.ui.scenario.createscenario.locationtype.ChooseLocationFragment
 import com.quyt.iot_demo.ui.scenario.createscenario.timetype.ChooseTimeFragment
 
 class SelectScenarioTypeFragment : Fragment() {
@@ -35,7 +36,15 @@ class SelectScenarioTypeFragment : Fragment() {
 
     private fun navigate() {
         mLayoutBinding.cvLocation.setOnClickListener {
-
+            val fragmentManager = mActivity.supportFragmentManager
+            val ft = fragmentManager.beginTransaction()
+            ft.add(
+                    R.id.rl_root,
+                    ChooseLocationFragment.newInstance(mActivity),
+                    ChooseLocationFragment().javaClass.simpleName
+            )
+            ft.addToBackStack(ChooseLocationFragment().javaClass.simpleName)
+            ft.commitAllowingStateLoss()
         }
         mLayoutBinding.cvTime.setOnClickListener {
             val fragmentManager = mActivity.supportFragmentManager

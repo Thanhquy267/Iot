@@ -54,18 +54,21 @@
                 android:padding="5dp"/>
         </RelativeLayout>
 
-         <androidx.viewpager.widget.ViewPager
-             android:id="@+id/vp_main"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:layout_below="@id/rl_actionbar"
-             android:layout_above="@id/tl_bottom"/>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tl_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"/>
+            android:layout_below="@id/rl_actionbar"
+            android:layout_above="@id/tl_bottom"/>
+
+         <androidx.viewpager.widget.ViewPager
+             android:id="@+id/vp_main"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:layout_below="@id/tl_bottom"
+             android:layout_alignParentBottom="true"/>
+
 
     </RelativeLayout>
 </layout>

@@ -15,6 +15,7 @@ import com.quyt.iot_demo.adapter.ScenarioDeviceAdapter
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.DialogDeviceStateBinding
 import com.quyt.iot_demo.databinding.FragmentChooseDeviceBinding
+import com.quyt.iot_demo.model.Condition
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.ui.scenario.createscenario.CreateScenarioActivity
 import com.quyt.iot_demo.ui.scenario.createscenario.SelectScenarioTypeFragment
@@ -89,13 +90,16 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
         binding.rgSensorState.setOnCheckedChangeListener { _, checkedId ->
             item.state = if (checkedId == R.id.rb_on) "ON" else "OFF"
             if (mIsInput) {
-                mActivity.addInput(item)
+                mActivity.addInput(Condition().apply {
+                    type = "device"
+                    device = item
+                })
             } else {
                 mActivity.addOutput(item)
             }
             alert.dismiss()
             val fm = mActivity.supportFragmentManager.findFragmentByTag(SelectScenarioTypeFragment().javaClass.simpleName)
-            if ( fm != null){
+            if (fm != null) {
                 mActivity.supportFragmentManager.beginTransaction().remove(fm).commit()
             }
             mActivity.supportFragmentManager.popBackStack()

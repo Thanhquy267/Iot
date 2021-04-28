@@ -22,5 +22,5 @@ class Scenario {
     var actions: ArrayList<Device>? = null
 
     @SerializedName("conditions")
-    var conditions: ArrayList<Device>? = null
+    var conditions: ArrayList<Condition>? = null
 }

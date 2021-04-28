@@ -30,6 +30,10 @@ class ScenarioActivity : AppCompatActivity(), OnScenarioListener {
         supportActionBar?.hide()
         mLayoutBinding = DataBindingUtil.setContentView(this, R.layout.activity_scenario)
         setupActionBar()
+    }
+
+    override fun onResume() {
+        super.onResume()
         getScenarios()
     }
 
@@ -63,6 +67,7 @@ class ScenarioActivity : AppCompatActivity(), OnScenarioListener {
         Api.request(this, Api.service.getScenario(mSharedPreference.currentHome?.id
                 ?: 0, mSharedPreference.currentUser?.id ?: 0),
                 Consumer { result ->
+                    mListScenario.clear()
                     result.data?.forEach {
                         mListScenario.add(it)
                     }

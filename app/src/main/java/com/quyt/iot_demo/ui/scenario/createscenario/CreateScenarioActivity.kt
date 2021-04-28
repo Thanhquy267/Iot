@@ -9,22 +9,25 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.quyt.iot_demo.R
+import com.quyt.iot_demo.adapter.ConditionAdapter
+import com.quyt.iot_demo.adapter.ConditionListener
 import com.quyt.iot_demo.adapter.ContextDeviceListener
 import com.quyt.iot_demo.adapter.ScenarioDeviceAdapter
 import com.quyt.iot_demo.data.Api
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityCreateScenarioBinding
+import com.quyt.iot_demo.model.Condition
 import com.quyt.iot_demo.model.Device
 import com.quyt.iot_demo.model.Scenario
 import com.quyt.iot_demo.ui.scenario.createscenario.devicetype.ChooseDeviceFragment
 import io.reactivex.functions.Consumer
 
-class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
+class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener,ConditionListener {
     private val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(this) }
     lateinit var mLayoutBinding: ActivityCreateScenarioBinding
-    private var mListInput = ArrayList<Device>()
+    private var mListConditions = ArrayList<Condition>()
     private var mListOutput = ArrayList<Device>()
-    private var mInputAdapter: ScenarioDeviceAdapter? = null
+    private var mInputAdapter: ConditionAdapter? = null
     private var mOutputAdapter: ScenarioDeviceAdapter? = null
     private var mScenario: Scenario? = null
 
@@ -47,9 +50,9 @@ class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
             Handler().postDelayed({
                 mLayoutBinding.etName.setText(mScenario?.name)
             }, 300)
-            mScenario?.conditions?.forEach {
-                mListInput.add(it)
-            }
+//            mScenario?.conditions?.forEach {
+//                mListConditions.add(it)
+//            }
             mScenario?.actions?.forEach {
                 mListOutput.add(it)
             }
@@ -65,7 +68,7 @@ class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
                 this.userId = mSharedPreference.currentUser?.id ?: 0
                 this.homeId = mSharedPreference.currentHome?.id ?: 0
                 this.actions = mListOutput
-                this.conditions = mListInput
+                this.conditions = mListConditions
                 this.isActivate = true
             }
             Api.request(this, Api.service.createScenario(scenario),
@@ -86,7 +89,7 @@ class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
     }
 
     private fun initInputList() {
-        mInputAdapter = ScenarioDeviceAdapter(mListInput, this)
+        mInputAdapter = ConditionAdapter(mListConditions, this)
         mLayoutBinding.rvInput.adapter = mInputAdapter
         mLayoutBinding.rvInput.layoutManager = LinearLayoutManager(this)
     }
@@ -131,8 +134,8 @@ class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
         }
     }
 
-    fun addInput(device: Device) {
-        mListInput.add(device)
+    fun addInput(device: Condition) {
+        mListConditions.add(device)
         mInputAdapter?.notifyDataSetChanged()
     }
 
@@ -142,5 +145,9 @@ class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener {
     }
 
     override fun onContextDeviceClicked(item: Device?) {
+    }
+
+    override fun onConditionClicked(item: Condition?) {
+
     }
 }
