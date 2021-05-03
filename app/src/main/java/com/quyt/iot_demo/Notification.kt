@@ -8,6 +8,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.Message
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.quyt.iot_demo.ui.HomeActivity
@@ -18,7 +19,7 @@ class Notification {
 
         @RequiresApi(Build.VERSION_CODES.O)
 
-        fun createNotification(context: Context){
+        fun createNotification(context: Context,message: String){
             val notificationManager: NotificationManager = GlobalApplication.appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
             val audioAttributes = AudioAttributes.Builder()
@@ -42,7 +43,7 @@ class Notification {
             builder.setSmallIcon(R.drawable.logo_2)
                 .setContentIntent(pendingIntent)
                 .setContentTitle("Tính năng tự động")
-                .setContentText("Bạn đã về nhà, bạn có muốn bật đèn không?")
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             val notification = builder.build()

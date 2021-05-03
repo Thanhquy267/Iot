@@ -79,9 +79,9 @@ class HomeActivity : BaseActivity() {
 //                mLayoutBinding.view.scLivingRoom.performClick()
 //            }, 500)
 //        }
-//        if (!isLocationServiceRunning()) {
-//            actionOnService(Actions.START)
-//        }
+        if (!isLocationServiceRunning()) {
+            actionOnService(Actions.START)
+        }
     }
 
     override fun onResume() {
@@ -115,7 +115,7 @@ class HomeActivity : BaseActivity() {
         val adapter = MainPagerAdapter(supportFragmentManager)
         adapter.addFrag(mControlFragment, "Device")
         adapter.addFrag(mSensorFragment, "Sensor")
-        adapter.addFrag(mIRFragment, "IR")
+//        adapter.addFrag(mIRFragment, "IR")
         mLayoutBinding.view.vpMain.adapter = adapter
         mLayoutBinding.view.tlBottom.setupWithViewPager(mLayoutBinding.view.vpMain)
     }

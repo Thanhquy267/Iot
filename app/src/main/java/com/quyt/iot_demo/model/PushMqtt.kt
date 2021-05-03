@@ -25,5 +25,6 @@ enum class ActionType(val value : String){
     CONNECT("paring"),
     CREATE("create"),
     UPDATE_INFO("info"),
-    CHANGE_STATE("state")
+    CHANGE_STATE("state"),
+    LOCATION("location")
 }

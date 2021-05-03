@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:id="@+id/rl_root"
@@ -61,6 +62,53 @@
                         android:tint="@color/white"
                         android:src="@drawable/ic_baseline_my_location_24"
                         android:layout_gravity="center"/>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/white"
+                    android:layout_margin="10dp"
+                    app:cardCornerRadius="5dp"
+                    android:visibility="gone">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@color/white">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_location"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/cv_confirm"
+                            android:textColor="@color/primary"
+                            android:textSize="15sp"
+                            tools:text="191 Đường số 28, Gò Vấp, Hồ Chí minh"
+                            android:layout_marginStart="10dp"
+                            android:layout_centerVertical="true"/>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cv_confirm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            app:cardBackgroundColor="@color/bluef5"
+                            app:cardCornerRadius="5dp"
+                            android:layout_margin="10dp">
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tv_confirm"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp"
+                                android:textColor="@color/white"
+                                android:textSize="15sp"
+                                android:text="Xác nhận"/>
+                        </androidx.cardview.widget.CardView>
+                    </RelativeLayout>
                 </androidx.cardview.widget.CardView>
             </RelativeLayout>
         </LinearLayout>

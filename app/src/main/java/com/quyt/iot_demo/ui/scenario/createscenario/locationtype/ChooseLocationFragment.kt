@@ -27,7 +27,7 @@ class ChooseLocationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupActionBar()
         mLayoutBinding.rgLocation.setOnCheckedChangeListener { _, checkedId ->
-            mLocationType = if (checkedId == R.id.rb_go_home) "Về nhà" else "Rời khỏi nhà"
+            mLocationType = if (checkedId == R.id.rb_go_home) "Đã về nhà" else "Đã ra khỏi nhà"
         }
         mLayoutBinding.cvCreate.setOnClickListener {
             mActivity.addInput(Condition().apply {

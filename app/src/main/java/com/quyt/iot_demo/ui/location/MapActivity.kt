@@ -8,6 +8,8 @@ import android.location.Geocoder
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -18,9 +20,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.quyt.iot_demo.R
 import com.quyt.iot_demo.custom.BaseActivity
+import com.quyt.iot_demo.data.Api
 import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityMapBinding
+import com.quyt.iot_demo.model.Geom
+import com.quyt.iot_demo.model.Home
+import io.reactivex.functions.Consumer
 import java.util.*
+import kotlin.math.roundToInt
 
 
 class MapActivity : BaseActivity() {
@@ -28,6 +35,8 @@ class MapActivity : BaseActivity() {
     lateinit var mLayoutBinding: ActivityMapBinding
     private var mGoogleMap: GoogleMap? = null
     private var mapFragment: SupportMapFragment? = null
+    private var mLagLng: LatLng? = null
+    private var mAddress = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +44,32 @@ class MapActivity : BaseActivity() {
         mLayoutBinding = DataBindingUtil.setContentView(this, R.layout.activity_map)
         setupActionBar()
         initMap()
+        mLayoutBinding.cvConfirm.setOnClickListener {
+            Api.request(this, Api.service.updateHomeLocation(mSharedPreference.currentHome?.id ?: 0, Home().apply {
+                this.address = mAddress
+                this.geom = Geom().apply {
+                    val coordinates = ArrayList<Double>()
+                    coordinates.add(mLagLng?.latitude ?: 0.0)
+                    coordinates.add(mLagLng?.longitude ?: 0.0)
+                    this.coordinates = coordinates
+                }
+            }),
+                    success = Consumer {
+                        mSharedPreference.currentHome = it
+                        finish()
+                    },
+                    error = Consumer {
+                        Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    })
+//            mSharedPreference.currentHome?.geom = Geom().apply {
+//                val coordinates = ArrayList<Double>()
+//                coordinates.add(mLagLng?.latitude ?: 0.0)
+//                coordinates.add(mLagLng?.longitude ?: 0.0)
+//                this.coordinates = coordinates
+//            }
+//            mSharedPreference.currentHome?.address = mAddress
+//            finish()
+        }
     }
 
     private fun setupActionBar() {
@@ -73,6 +108,7 @@ class MapActivity : BaseActivity() {
 
 
     private fun addMarker(lng: LatLng) {
+        mLayoutBinding.cvAddress.visibility = View.VISIBLE
         mGoogleMap?.clear()
         mGoogleMap?.addMarker(MarkerOptions().position(lng))
         mGoogleMap?.addCircle(
@@ -84,10 +120,13 @@ class MapActivity : BaseActivity() {
                         .fillColor(getColorWithAlpha(R.color.grey_33, 0.15f))
         )
         mGoogleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(lng, 16.5f))
-        Log.d("GeocoderAddress", getCompleteAddressString(lng).toString())
+        mLagLng = lng
+        mAddress = getCompleteAddressString(lng)
+        Log.d("GeocoderAddress", mAddress)
+        mLayoutBinding.tvLocation.text = mAddress
     }
 
-    private fun getCompleteAddressString(lng: LatLng): String? {
+    private fun getCompleteAddressString(lng: LatLng): String {
         var strAdd = ""
         val geocoder = Geocoder(this, Locale.getDefault())
         try {
@@ -99,20 +138,20 @@ class MapActivity : BaseActivity() {
                     strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
                 }
                 strAdd = strReturnedAddress.toString()
-                Log.w("My Current loction address", strReturnedAddress.toString())
+                Log.w("My Current location address", strReturnedAddress.toString())
             } else {
-                Log.w("My Current loction address", "No Address returned!")
+                Log.w("My Current location address", "No Address returned!")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.w("My Current loction address", "Canont get Address!")
+            Log.w("My Current location address", "Cannot get Address!")
         }
         return strAdd
     }
 
-    fun getColorWithAlpha(color: Int, ratio: Float): Int {
+    private fun getColorWithAlpha(color: Int, ratio: Float): Int {
         val newColor: Int
-        val alpha = Math.round(Color.alpha(color) * ratio)
+        val alpha = (Color.alpha(color) * ratio).roundToInt()
         val r = Color.red(color)
         val g = Color.green(color)
         val b = Color.blue(color)
