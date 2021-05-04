@@ -68,7 +68,7 @@ class LocationService() : BaseLocationService() {
                 mLeaveHome = 0
             }
         }else{
-            if (distance < 150){
+            if (distance < 100){
                 Log.d("Test Location","Đang ra khỏi nhà")
                 mGoHome = 0
                 mLeaveHome = 0
