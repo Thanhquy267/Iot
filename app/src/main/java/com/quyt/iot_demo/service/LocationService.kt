@@ -11,10 +11,7 @@ import com.quyt.iot_demo.Constant
 import com.quyt.iot_demo.GlobalApplication
 import com.quyt.iot_demo.Notification
 import com.quyt.iot_demo.data.SharedPreferenceHelper
-import com.quyt.iot_demo.model.ActionType
-import com.quyt.iot_demo.model.ClientType
-import com.quyt.iot_demo.model.Device
-import com.quyt.iot_demo.model.PushMqtt
+import com.quyt.iot_demo.model.*
 import com.quyt.iot_demo.mqtt.MQTTClient
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
@@ -96,7 +93,9 @@ class LocationService() : BaseLocationService() {
             clientType = ClientType.APP_TYPE.value
             actionType = ActionType.LOCATION.value
             data = Device().apply {
-                state = message
+                data = DeviceData().apply {
+                    state = message
+                }
             }
         }
         GlobalApplication.mqttClient.publish(

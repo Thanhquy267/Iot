@@ -73,7 +73,7 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
         binding.tvBrightness.visibility = if (mIsInput) View.GONE else View.VISIBLE
         binding.sbBrightness.visibility = if (mIsInput) View.GONE else View.VISIBLE
         //
-        binding.sbBrightness.progress = item.brightness
+        binding.sbBrightness.progress = item.data?.brightness?:0
         //
         binding.sbBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -83,12 +83,12 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                item.brightness = seekBar?.progress ?: 0
+                item.data?.brightness = seekBar?.progress ?: 0
             }
         })
 
         binding.rgSensorState.setOnCheckedChangeListener { _, checkedId ->
-            item.state = if (checkedId == R.id.rb_on) "ON" else "OFF"
+            item.data?.state = if (checkedId == R.id.rb_on) "ON" else "OFF"
             if (mIsInput) {
                 mActivity.addInput(Condition().apply {
                     type = "device"

@@ -21,10 +21,7 @@ import com.quyt.iot_demo.data.SharedPreferenceHelper
 import com.quyt.iot_demo.databinding.ActivityAddDeviceBinding
 import com.quyt.iot_demo.databinding.DialogAddNameBinding
 import com.quyt.iot_demo.esptouch.util.TouchNetUtil
-import com.quyt.iot_demo.model.ActionType
-import com.quyt.iot_demo.model.ClientType
-import com.quyt.iot_demo.model.Device
-import com.quyt.iot_demo.model.PushMqtt
+import com.quyt.iot_demo.model.*
 import com.quyt.iot_demo.service.EspTouchListener
 import com.quyt.iot_demo.service.EsptouchAsyncTask4
 import com.quyt.iot_demo.utils.NetUtils
@@ -70,7 +67,7 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
         super.onMessageArrived(topic, message)
         val espPushModel = Gson().fromJson(message.toString(), PushMqtt::class.java)
         if (espPushModel.clientType == ClientType.ESP_TYPE.value && espPushModel.actionType == ActionType.CONNECT.value) {
-            if (espPushModel.data?.state == "Connect success") {
+            if (espPushModel.data?.data?.state == "Connect success") {
                 mProgressDialog?.dismiss()
                 showCustomDialog()
             } else {
@@ -171,8 +168,11 @@ class AddDeviceActivity : BaseActivity(), EspTouchListener {
             this.type = mType
             this.macAddress = macID
             this.name = deviceName
-            this.state = "OFF"
-            this.brightness = 0
+            this.userId = mSharedPreference.currentUser?.id
+            this.data = DeviceData().apply {
+                state = "OFF"
+                brightness = 0
+            }
         }
         Api.request(this, Api.service.addDeviceToHome(1, device),
             success = Consumer {

@@ -38,7 +38,7 @@ class DeviceAdapter(private val mListDevice: ArrayList<Device>?, val listener: O
             it.macAddress == device?.macAddress
         }
         val pos = mListDevice?.indexOf(deviceNeedUpdate)
-        deviceNeedUpdate?.state = device?.state
+        deviceNeedUpdate?.data?.state = device?.data?.state
         if (deviceNeedUpdate != null) {
             mListDevice?.set(pos ?: 0, deviceNeedUpdate)
             notifyItemChanged(pos ?: 0)
@@ -50,10 +50,10 @@ class DeviceViewHolder(val binding: ItemDeviceBinding, val listener: OnDeviceLis
     @SuppressLint("ClickableViewAccessibility")
     fun bind(item: Device?) {
         binding.tvTitle.text = item?.name
-        binding.scSwitch.isChecked = item?.state == "ON"
-        binding.sbBrightness.progress = item?.brightness ?: 0
+        binding.scSwitch.isChecked = item?.data?.state == "ON"
+        binding.sbBrightness.progress = item?.data?.brightness ?: 0
         binding.scSwitch.setOnCheckedChangeListener { _, isChecked ->
-            item?.state = if (isChecked) "ON" else "OFF"
+            item?.data?.state = if (isChecked) "ON" else "OFF"
             listener.onDeviceStateChange(item, binding.scSwitch.isPressed)
         }
 //        binding.cvRoot.setOnClickListener {
@@ -74,7 +74,7 @@ class DeviceViewHolder(val binding: ItemDeviceBinding, val listener: OnDeviceLis
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                item?.brightness = prog
+                item?.data?.brightness = prog
                 listener.onBrightnessChange(item)
             }
 

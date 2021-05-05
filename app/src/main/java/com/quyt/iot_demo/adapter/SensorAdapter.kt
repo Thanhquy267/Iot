@@ -29,7 +29,7 @@ class SensorAdapter(private val mListSensor: ArrayList<Device>?) : RecyclerView.
             it.macAddress == device?.macAddress
         }
         val pos = mListSensor?.indexOf(deviceNeedUpdate)
-        deviceNeedUpdate?.state = device?.state
+        deviceNeedUpdate?.data?.state = device?.data?.state
         if (deviceNeedUpdate != null) {
             mListSensor?.set(pos ?: 0, deviceNeedUpdate)
             notifyItemChanged(pos ?: 0)
@@ -50,7 +50,7 @@ class SensorViewHolder(val binding: ItemSensorBinding) : RecyclerView.ViewHolder
     @SuppressLint("ClickableViewAccessibility")
     fun bind(item: Device?) {
         binding.tvTitle.text = item?.name
-        binding.ivIcon.imageTintList = if (item?.state == "ON") ColorStateList.valueOf(ContextCompat.getColor(binding.root.context,R.color.bluef5))
+        binding.ivIcon.imageTintList = if (item?.data?.state == "ON") ColorStateList.valueOf(ContextCompat.getColor(binding.root.context,R.color.bluef5))
         else ColorStateList.valueOf(ContextCompat.getColor(binding.root.context,R.color.normal_text))
     }
 }

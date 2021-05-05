@@ -25,7 +25,7 @@ class ScenarioDeviceAdapter(private val mListDevice: ArrayList<Device>?, val lis
     fun changeState(item: Device) {
         mListDevice?.forEachIndexed { index, device ->
             if (device.id == item.id) {
-                device.state = item.state
+                device.data?.state = item.data?.state
 //                device.brightness = item.brightness
                 notifyItemChanged(index)
             }
@@ -39,9 +39,9 @@ class ScenarioDeviceViewHolder(val binding: ItemContextDeviceBinding, val listen
         binding.ivIcon.setImageResource(if (item?.type == "control") R.drawable.ic_light_bulb else R.drawable.ic_sensor)
         binding.tvTitle.text = item?.name
         if (item?.type == "control") {
-            binding.tvState.text = if (item.state == "ON") "Bật" + " | " + item.brightness else "Tắt"
+            binding.tvState.text = if (item.data?.state == "ON") "Bật" + " | " + item.data?.brightness else "Tắt"
         } else {
-            binding.tvState.text = if (item?.state == "ON") "Bật" else "Tắt"
+            binding.tvState.text = if (item?.data?.state == "ON") "Bật" else "Tắt"
         }
         binding.cvRoot.setOnClickListener {
             listener.onContextDeviceClicked(item)

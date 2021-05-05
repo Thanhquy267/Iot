@@ -31,9 +31,9 @@ class ConditionViewHolder(val binding: ItemConditionBinding, val listener: Condi
                 binding.ivIcon.setImageResource(if (item.device?.type == "control") R.drawable.ic_light_bulb else R.drawable.ic_sensor)
                 binding.tvTitle.text = item.device?.name
                 if (item.device?.type == "control") {
-                    binding.tvState.text = if (item.device?.state == "ON") "Bật" + " | " + item.device?.brightness else "Tắt"
+                    binding.tvState.text = if (item.device?.data?.state == "ON") "Bật" + " | " + item.device?.data?.brightness else "Tắt"
                 } else {
-                    binding.tvState.text = if (item.device?.state == "ON") "Bật" else "Tắt"
+                    binding.tvState.text = if (item.device?.data?.state == "ON") "Bật" else "Tắt"
                 }
             }
             "time" -> {
