@@ -21,6 +21,12 @@ class Device {
     @SerializedName("brightness")
     var brightness: Int = 0
 
+    @SerializedName("temp")
+    var temp: Float = 0f
+
+    @SerializedName("hum")
+    var hum: Int = 0
+
     @SerializedName("createdAt")
     var createdAt: String? = null
 

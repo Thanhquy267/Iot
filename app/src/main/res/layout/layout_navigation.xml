@@ -47,12 +47,13 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:layout_marginTop="10dp"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/ic_home"
                     android:tint="@color/bluef5" />
 
@@ -82,8 +83,8 @@
                 android:paddingVertical="10dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/ic_automation"
                     android:tint="@color/bluef5" />
 

@@ -117,7 +117,7 @@ class HomeActivity : BaseActivity() {
         adapter.addFrag(mSensorFragment, "Sensor")
 //        adapter.addFrag(mIRFragment, "IR")
         mLayoutBinding.view.vpMain.adapter = adapter
-        mLayoutBinding.view.tlBottom.setupWithViewPager(mLayoutBinding.view.vpMain)
+//        mLayoutBinding.view.tlBottom.setupWithViewPager(mLayoutBinding.view.vpMain)
     }
 
     private fun getHome() {

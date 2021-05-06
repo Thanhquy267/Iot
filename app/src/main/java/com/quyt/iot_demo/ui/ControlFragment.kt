@@ -6,8 +6,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -33,6 +35,7 @@ class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefre
     lateinit var mActivity: HomeActivity
     private var mListDevice = ArrayList<Device>()
     private var mDeviceAdapter: DeviceAdapter? = null
+    private var mDeviceLayoutManager : GridLayoutManager? = null
     private var mMqttClient: MQTTClient? = null
     private var mHomeId = 0
 
@@ -112,10 +115,25 @@ class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefre
     }
 
     private fun initRecyclerView() {
-        mDeviceAdapter = DeviceAdapter(ArrayList(), this)
+        mDeviceLayoutManager = GridLayoutManager(requireContext(),1)
+        mDeviceAdapter = DeviceAdapter(mDeviceLayoutManager,ArrayList(), this)
         mLayoutBinding.rvDevice.adapter = mDeviceAdapter
-        mLayoutBinding.rvDevice.layoutManager = LinearLayoutManager(requireContext())
+        mLayoutBinding.rvDevice.layoutManager = mDeviceLayoutManager
         (mLayoutBinding.rvDevice.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        mLayoutBinding.ivList.setColorFilter(ContextCompat.getColor(requireContext(), R.color.bluef5), android.graphics.PorterDuff.Mode.SRC_IN)
+        mLayoutBinding.ivList.setOnClickListener {
+            mDeviceLayoutManager?.spanCount = 1
+            mDeviceAdapter?.notifyItemRangeChanged(0,mDeviceAdapter?.itemCount?:0)
+            mLayoutBinding.ivList.setColorFilter(ContextCompat.getColor(requireContext(), R.color.bluef5), android.graphics.PorterDuff.Mode.SRC_IN)
+            mLayoutBinding.ivGrid.setColorFilter(ContextCompat.getColor(requireContext(), R.color.white), android.graphics.PorterDuff.Mode.SRC_IN)
+        }
+        mLayoutBinding.ivGrid.setOnClickListener {
+            mDeviceLayoutManager?.spanCount = 2
+            mDeviceAdapter?.notifyItemRangeChanged(0,mDeviceAdapter?.itemCount?:0)
+            mLayoutBinding.ivList.setColorFilter(ContextCompat.getColor(requireContext(), R.color.white), android.graphics.PorterDuff.Mode.SRC_IN)
+            mLayoutBinding.ivGrid.setColorFilter(ContextCompat.getColor(requireContext(), R.color.bluef5), android.graphics.PorterDuff.Mode.SRC_IN)
+        }
+
     }
 
     private fun initSwipeToRefreshLayout() {
@@ -135,6 +153,9 @@ class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefre
                     it.data?.forEach { device ->
                         mListDevice.add(device)
                     }
+//                    for (i in 0..10){
+//                        mListDevice.add(it.data?.get(0)!!)
+//                    }
                     mDeviceAdapter?.setData(mListDevice)
                     mLayoutBinding.swipeContainer.isRefreshing = false
                 },
