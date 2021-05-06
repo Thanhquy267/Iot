@@ -103,8 +103,8 @@ class HomeActivity : BaseActivity() {
 //                mSensorFragment.changeStatus(pushBody.data)
 //            }
             val data = pushBody.data
-            mSensorFragment.changeStatus(data)
-            mControlFragment.syncButtonState(data)
+            mSensorFragment.changeStatus(data?.toDeviceModel())
+            mControlFragment.syncButtonState(data?.toDeviceModel())
         }
     }
 

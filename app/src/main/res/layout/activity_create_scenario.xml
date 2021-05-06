@@ -7,6 +7,8 @@
         android:id="@+id/rl_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusableInTouchMode="true"
         android:background="@color/primary">
 
         <LinearLayout
@@ -50,14 +52,15 @@
                     android:orientation="vertical">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tl_email"
+                        android:id="@+id/tl_name"
                         style="@style/TextInputLayoutStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="5dp"
+                        android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="10dp"
                         android:hint="@string/name"
-                        android:textColorHint="@color/normal_text">
+                        android:textColorHint="@color/normal_text"
+                        app:errorEnabled="true">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_name"

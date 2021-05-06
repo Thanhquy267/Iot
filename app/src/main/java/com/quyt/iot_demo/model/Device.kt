@@ -19,18 +19,29 @@ class Device {
     var state: String? = null
 
     @SerializedName("brightness")
-    var brightness: Int = 0
+    var brightness: Int? = 0
 
     @SerializedName("temp")
-    var temp: Float = 0f
+    var temp: Float? = 0f
 
     @SerializedName("hum")
-    var hum: Int = 0
+    var hum: Int? = 0
 
     @SerializedName("createdAt")
     var createdAt: String? = null
 
     @SerializedName("updatedAt")
     var updatedAt: String? = null
+
+    fun toPushModel() : DevicePush{
+        return DevicePush().apply {
+            this.macAddress = this@Device.macAddress
+            this.type = this@Device.type
+            this.state = this@Device.state
+            this.hum = this@Device.hum
+            this.temp = this@Device.temp
+            this.brightness = this@Device.brightness
+        }
+    }
 
 }

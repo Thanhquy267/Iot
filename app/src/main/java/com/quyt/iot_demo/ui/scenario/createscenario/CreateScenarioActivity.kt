@@ -1,8 +1,12 @@
 package com.quyt.iot_demo.ui.scenario.createscenario
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -22,7 +26,8 @@ import com.quyt.iot_demo.model.Scenario
 import com.quyt.iot_demo.ui.scenario.createscenario.devicetype.ChooseDeviceFragment
 import io.reactivex.functions.Consumer
 
-class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener,ConditionListener {
+
+class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener, ConditionListener {
     private val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(this) }
     lateinit var mLayoutBinding: ActivityCreateScenarioBinding
     private var mListConditions = ArrayList<Condition>()
@@ -61,8 +66,32 @@ class CreateScenarioActivity : AppCompatActivity(), ContextDeviceListener,Condit
         initOutputList()
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (currentFocus != null) {
+            val imm: InputMethodManager =
+                    getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
     private fun createScenario() {
         mLayoutBinding.cvCreate.setOnClickListener {
+            if (mLayoutBinding.etName.text.toString().isEmpty()) {
+                mLayoutBinding.tlName.isErrorEnabled = true
+                mLayoutBinding.tlName.error = "Không được để trống tên"
+                return@setOnClickListener
+            } else {
+                mLayoutBinding.tlName.isErrorEnabled = false
+            }
+            if (mListConditions.isEmpty()) {
+                Toast.makeText(this, "Vui lòng chọn điều kiện", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (mListOutput.isEmpty()) {
+                Toast.makeText(this, "Vui lòng chọn thiết bị", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val scenario = Scenario().apply {
                 this.name = mLayoutBinding.etName.text.toString()
                 this.userId = mSharedPreference.currentUser?.id ?: 0

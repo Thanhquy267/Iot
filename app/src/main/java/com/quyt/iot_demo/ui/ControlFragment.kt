@@ -57,7 +57,7 @@ class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefre
         val pushBody = PushMqtt().apply {
             clientType = ClientType.APP_TYPE.value
             actionType = ActionType.CHANGE_STATE.value
-            data = device
+            data = device?.toPushModel()
         }
         mMqttClient?.publish(
                 device?.macAddress.toString(),
@@ -89,7 +89,7 @@ class ControlFragment : Fragment(), OnDeviceListener, SwipeRefreshLayout.OnRefre
         val pushBody = PushMqtt().apply {
             clientType = ClientType.APP_TYPE.value
             actionType = ActionType.CHANGE_STATE.value
-            data = device
+            data = device?.toPushModel()
         }
         mMqttClient?.publish(
                 device?.macAddress.toString(),

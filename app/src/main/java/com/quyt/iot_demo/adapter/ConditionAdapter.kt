@@ -2,6 +2,7 @@ package com.quyt.iot_demo.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +29,7 @@ class ConditionViewHolder(val binding: ItemConditionBinding, val listener: Condi
     fun bind(item: Condition?) {
         when (item?.type) {
             "device" -> {
+                binding.tvState.visibility = View.VISIBLE
                 binding.ivIcon.setImageResource(if (item.device?.type == "control") R.drawable.ic_light_bulb else R.drawable.ic_sensor)
                 binding.tvTitle.text = item.device?.name
                 if (item.device?.type == "control") {
@@ -37,10 +39,12 @@ class ConditionViewHolder(val binding: ItemConditionBinding, val listener: Condi
                 }
             }
             "time" -> {
+                binding.tvState.visibility = View.GONE
                 binding.ivIcon.setImageResource(R.drawable.ic_timer)
-                binding.tvTitle.text = item.time
+                binding.tvTitle.text = timeToDisplayText(item.time?:"10")
             }
             "location" -> {
+                binding.tvState.visibility = View.GONE
                 binding.ivIcon.setImageResource(R.drawable.ic_baseline_location_on_24)
                 binding.tvTitle.text = item.location
             }
@@ -48,6 +52,23 @@ class ConditionViewHolder(val binding: ItemConditionBinding, val listener: Condi
         binding.cvRoot.setOnClickListener {
             listener.onConditionClicked(item)
         }
+    }
+
+    fun timeToDisplayText(timeStr : String) : String{
+        val time = timeStr.toInt()/1000
+        var minutes = 0
+        var seconds = 0
+        var minutesTxt = ""
+        minutes = time/60
+        seconds = time%60
+        minutesTxt = if(minutes == 0){
+            ""
+        }else{
+            "$minutes phút "
+        }
+
+        minutes.toString()
+        return "$minutesTxt$seconds giây sau"
     }
 }
 

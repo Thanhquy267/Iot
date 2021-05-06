@@ -40,7 +40,6 @@ class ChooseTimeFragment : Fragment() {
         setupActionBar()
         initTime()
         mLayoutBinding.cvCreate.setOnClickListener {
-            Toast.makeText(requireContext(), "$mMinute:$mSecond", Toast.LENGTH_SHORT).show()
             mActivity.addInput(Condition().apply {
                 this.type = "time"
                 this.time = ((mMinute * 60 + mSecond) * 1000).toString()

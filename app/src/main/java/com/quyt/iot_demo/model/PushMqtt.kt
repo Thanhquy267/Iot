@@ -11,8 +11,40 @@ class PushMqtt {
     var actionType : String? = null
 
     @SerializedName("data")
-    var data : Device? = null
+    var data : DevicePush? = null
 
+}
+
+class DevicePush {
+
+    @SerializedName("type")
+    var type: String? = null
+
+    @SerializedName("macAddress")
+    var macAddress: String? = null
+
+    @SerializedName("state")
+    var state: String? = null
+
+    @SerializedName("brightness")
+    var brightness: Int? = 0
+
+    @SerializedName("temp")
+    var temp: Float? = 0f
+
+    @SerializedName("hum")
+    var hum: Int? = 0
+
+    fun toDeviceModel() : Device{
+        return Device().apply {
+            this.macAddress = this@DevicePush.macAddress
+            this.type = this@DevicePush.type
+            this.state = this@DevicePush.state
+            this.hum = this@DevicePush.hum
+            this.temp = this@DevicePush.temp
+            this.brightness = this@DevicePush.brightness
+        }
+    }
 }
 
 enum class ClientType(val value : String){

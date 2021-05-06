@@ -73,7 +73,7 @@ class ChooseDeviceFragment : Fragment(), ContextDeviceListener {
         binding.tvBrightness.visibility = if (mIsInput) View.GONE else View.VISIBLE
         binding.sbBrightness.visibility = if (mIsInput) View.GONE else View.VISIBLE
         //
-        binding.sbBrightness.progress = item.brightness
+        binding.sbBrightness.progress = item.brightness?:0
         //
         binding.sbBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

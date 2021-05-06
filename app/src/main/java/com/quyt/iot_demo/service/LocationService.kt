@@ -97,7 +97,7 @@ class LocationService() : BaseLocationService() {
             actionType = ActionType.LOCATION.value
             data = Device().apply {
                 state = message
-            }
+            }.toPushModel()
         }
         GlobalApplication.mqttClient.publish(
                 mSharedPreference.currentUser?.id.toString(),
