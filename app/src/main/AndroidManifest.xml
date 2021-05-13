@@ -40,6 +40,7 @@
         </activity>
         <activity android:name=".ui.scenario.createscenario.CreateScenarioActivity" />
         <activity android:name=".ui.location.MapActivity" />
+        <activity android:name=".ui.CameraActivity" />
 
         <service
             android:name=".TimerJobService"

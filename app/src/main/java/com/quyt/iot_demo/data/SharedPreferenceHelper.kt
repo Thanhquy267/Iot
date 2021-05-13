@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.preference.PreferenceManager
 import com.google.gson.Gson
+import com.quyt.iot_demo.model.Camera
 import com.quyt.iot_demo.model.Home
 import com.quyt.iot_demo.model.User
 
@@ -80,6 +81,15 @@ class SharedPreferenceHelper private constructor(
             PreferenceUtils.saveToPrefs(context, USER_LOCATION_KEY, str)
         }
 
+    var camera: Camera?
+        get() {
+            val json = preference.getString(CAMERA, "")
+            return gson.fromJson(json, Camera::class.java)
+        }
+        set(value) {
+            PreferenceUtils.saveToPrefs(context, CAMERA, Gson().toJson(value))
+        }
+
     /**
      * support get value from key
      * @return
@@ -100,6 +110,7 @@ class SharedPreferenceHelper private constructor(
         private const val USER = "USER"
         private const val ISLOGGING = "ISLOGGING"
         private const val HOME = "HOME"
+        private const val CAMERA = "CAMERA"
         private const val USER_LOCATION_KEY = "USER_LOCATION_KEY"
 
         /**

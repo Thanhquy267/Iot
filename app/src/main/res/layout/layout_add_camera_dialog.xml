@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="@color/secondary">
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:padding="20dp"
+           android:layout_centerInParent="true"
+           android:orientation="vertical">
+           <com.google.android.material.textfield.TextInputLayout
+               android:id="@+id/tl_name"
+               style="@style/TextInputLayoutStyle"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="8dp"
+               android:hint="Tên"
+               android:textColorHint="@color/normal_text">
+
+               <com.google.android.material.textfield.TextInputEditText
+                   android:id="@+id/et_name"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:textColor="@color/title_text"
+                   android:inputType="text"
+                   android:singleLine="true" />
+           </com.google.android.material.textfield.TextInputLayout>
+
+           <com.google.android.material.textfield.TextInputLayout
+               android:id="@+id/tl_ip"
+               style="@style/TextInputLayoutStyle"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="8dp"
+               android:hint="IP"
+               android:textColorHint="@color/normal_text">
+
+               <com.google.android.material.textfield.TextInputEditText
+                   android:id="@+id/et_ip"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:textColor="@color/title_text"
+                   android:inputType="text"
+                   android:singleLine="true" />
+           </com.google.android.material.textfield.TextInputLayout>
+
+           <com.google.android.material.textfield.TextInputLayout
+               android:id="@+id/tl_port"
+               style="@style/TextInputLayoutStyle"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="8dp"
+               android:hint="Port"
+               android:textColorHint="@color/normal_text">
+
+               <com.google.android.material.textfield.TextInputEditText
+                   android:id="@+id/et_port"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:textColor="@color/title_text"
+                   android:inputType="number"
+                   android:singleLine="true" />
+           </com.google.android.material.textfield.TextInputLayout>
+
+           <com.google.android.material.textfield.TextInputLayout
+               android:id="@+id/tl_user"
+               style="@style/TextInputLayoutStyle"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="8dp"
+               android:hint="User"
+               android:textColorHint="@color/normal_text">
+
+               <com.google.android.material.textfield.TextInputEditText
+                   android:id="@+id/et_user"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:textColor="@color/title_text"
+                   android:inputType="text"
+                   android:singleLine="true" />
+           </com.google.android.material.textfield.TextInputLayout>
+
+           <com.google.android.material.textfield.TextInputLayout
+               android:id="@+id/tl_pw"
+               style="@style/TextInputLayoutStyle"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="8dp"
+               android:hint="@string/password"
+               android:textColorHint="@color/normal_text"
+               app:passwordToggleEnabled="true">
+
+               <com.google.android.material.textfield.TextInputEditText
+                   android:id="@+id/et_pw"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:textColor="@color/title_text"
+                   android:inputType="textPassword"
+                   android:singleLine="true" />
+           </com.google.android.material.textfield.TextInputLayout>
+
+           <androidx.cardview.widget.CardView
+               android:id="@+id/cv_add"
+               style="@style/clickableCard"
+               android:layout_width="120dp"
+               android:layout_height="45dp"
+               android:layout_gravity="center_horizontal"
+               android:layout_marginTop="30dp"
+               app:cardBackgroundColor="@color/bluef5"
+               app:cardCornerRadius="60dp">
+
+               <androidx.appcompat.widget.AppCompatTextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center"
+                   android:text="@string/add"
+                   android:textColor="@color/white"
+                   android:textSize="17sp" />
+           </androidx.cardview.widget.CardView>
+
+       </LinearLayout>
+    </RelativeLayout>
+</layout>

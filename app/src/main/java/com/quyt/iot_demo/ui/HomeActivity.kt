@@ -4,11 +4,16 @@ import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.maps.model.LatLng
@@ -27,17 +32,22 @@ import com.quyt.iot_demo.service.LocationService
 import com.quyt.iot_demo.service.ServiceState
 import com.quyt.iot_demo.service.getServiceState
 import com.quyt.iot_demo.ui.add.AddDeviceActivity
-import com.quyt.iot_demo.ui.scenario.ScenarioActivity
 import com.quyt.iot_demo.ui.location.MapActivity
+import com.quyt.iot_demo.ui.scenario.ScenarioActivity
+import com.quyt.iot_demo.utils.DialogUtils
 import io.reactivex.functions.Consumer
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttMessage
+import org.videolan.libvlc.IVLCVout
+import org.videolan.libvlc.LibVLC
+import org.videolan.libvlc.Media
+import org.videolan.libvlc.MediaPlayer
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 
 
-class HomeActivity : BaseActivity() {
+class HomeActivity : BaseActivity(), IVLCVout.Callback {
 
     lateinit var mLayoutBinding: ActivityHomeBinding
     val mSharedPreference by lazy { SharedPreferenceHelper.getInstance(this) }
@@ -48,6 +58,14 @@ class HomeActivity : BaseActivity() {
     private lateinit var mControlFragment: ControlFragment
     private lateinit var mSensorFragment: SensorFragment
     private lateinit var mIRFragment: IRFragment
+
+    //
+    private val TAG = "StreamCamera"
+    private var mFilePath: String = ""
+    private var libvlc: LibVLC? = null
+    private lateinit var mMediaPlayer: MediaPlayer
+    private var mVideoWidth = 0
+    private var mVideoHeight = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +88,12 @@ class HomeActivity : BaseActivity() {
             val intent = Intent(this, AddDeviceActivity::class.java)
             startActivity(intent)
         }
+
+        mLayoutBinding.view.ivMore.setOnClickListener {
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
+        }
+
         mLayoutBinding.view.ivMenu.setOnClickListener {
             mLayoutBinding.drawerLayout.openDrawer(Gravity.LEFT)
         }
@@ -79,14 +103,130 @@ class HomeActivity : BaseActivity() {
 //                mLayoutBinding.view.scLivingRoom.performClick()
 //            }, 500)
 //        }
+
         if (!isLocationServiceRunning()) {
             actionOnService(Actions.START)
         }
+
+        //
+        mFilePath = "rtsp://admin:IPNKXL@192.168.1.196:554/video.mp4"
+//        Log.d(TAG, "Playing: $mFilePath")
+//        if (mSharedPreference.camera != null) {
+//            val camera = mSharedPreference.camera
+//            mFilePath = "rtsp://${camera?.user}:${camera?.pw}@${camera?.ip}:${camera?.port}/video.mp4"
+//            createPlayer(mFilePath)
+//        }
+//        mLayoutBinding.view.tvCameraError.setOnClickListener {
+//            DialogUtils.addCamera(this, successConsumer = Consumer {
+//                mSharedPreference.camera = it
+//                mFilePath = "rtsp://${it.user}:${it.pw}@${it.ip}:${it.port}/video.mp4"
+//                createPlayer(mFilePath)
+//            })
+//        }
+    }
+
+    private fun setSize(width: Int, height: Int) {
+        mVideoWidth = width
+        mVideoHeight = height
+        if (mVideoWidth * mVideoHeight <= 1) return
+        if (mLayoutBinding.view.surface.holder == null) return
+        var w = window.decorView.width
+        var h = window.decorView.height
+        val isPortrait =
+            resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        if (w > h && isPortrait || w < h && !isPortrait) {
+            val i = w
+            w = h
+            h = i
+        }
+        val videoAR = mVideoWidth.toFloat() / mVideoHeight.toFloat()
+        val screenAR = w.toFloat() / h.toFloat()
+        if (screenAR < videoAR) h = (w / videoAR).toInt() else w = (h * videoAR).toInt()
+        mLayoutBinding.view.surface.holder?.setFixedSize(mVideoWidth, mVideoHeight)
+        val lp: ViewGroup.LayoutParams = mLayoutBinding.view.surface.layoutParams
+        lp.width = w
+        lp.height = h
+        mLayoutBinding.view.surface.layoutParams = lp
+        mLayoutBinding.view.surface.invalidate()
+    }
+
+    private fun createPlayer(media: String) {
+        try {
+//            if (media.isNotEmpty()) {
+//                val toast = Toast.makeText(this, media, Toast.LENGTH_LONG)
+//                toast.setGravity(
+//                    Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0,
+//                    0
+//                )
+//                toast.show()
+//            }
+            // Create LibVLC
+            // TODO: make this more robust, and sync with audio demo
+            val options = ArrayList<String>()
+            //options.add("--subsdec-encoding <encoding>");
+            options.add("--aout=opensles")
+            options.add("--audio-time-stretch") // time stretching
+            options.add("-vvv") // verbosity
+            libvlc = LibVLC(this, options)
+            mLayoutBinding.view.surface.holder.setKeepScreenOn(true)
+            // Creating media player
+            mMediaPlayer = MediaPlayer(libvlc)
+            mMediaPlayer.setEventListener {
+                when (it.type) {
+                    MediaPlayer.Event.EndReached -> {
+                        Log.d("StreamCamera", "MediaPlayerEndReached")
+                    }
+                    MediaPlayer.Event.Playing -> {
+                        Log.d("StreamCamera", "Playing")
+//                        mLayoutBinding.view.surface.visibility = View.VISIBLE
+//                        mLayoutBinding.view.tvCameraError.visibility = View.GONE
+//                        mLayoutBinding.view.progress.visibility = View.GONE
+                    }
+                    MediaPlayer.Event.EncounteredError -> {
+                        Log.d("StreamCamera", "EncounteredError")
+//                        mLayoutBinding.view.surface.visibility = View.GONE
+//                        mLayoutBinding.view.tvCameraError.text = "Lỗi camera"
+//                        mLayoutBinding.view.tvCameraError.visibility = View.VISIBLE
+//                        mLayoutBinding.view.progress.visibility = View.GONE
+                    }
+                    MediaPlayer.Event.Stopped -> {
+                        Log.d("StreamCamera", "Stopped")
+                    }
+                    MediaPlayer.Event.ESDeleted -> {
+                        Log.d("StreamCamera", "ESDeleted")
+                    }
+                    MediaPlayer.Event.Vout -> {
+                        Log.d("StreamCamera", "Vout")
+                    }
+                    else -> {
+
+                    }
+                }
+            }
+            // Seting up video output
+            val vout = mMediaPlayer.vlcVout
+            vout.setVideoView(mLayoutBinding.view.surface)
+            //vout.setSubtitlesView(mLayoutBinding.surfaceSubtitles);
+            vout.addCallback(this)
+            vout.attachViews()
+//            mLayoutBinding.view.progress.visibility = View.VISIBLE
+            val m = Media(libvlc, Uri.parse(media))
+            mMediaPlayer.media = m
+            mMediaPlayer.play()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error in creating player!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        setSize(mVideoWidth, mVideoHeight)
     }
 
     override fun onResume() {
         super.onResume()
         getHome()
+        createPlayer(mFilePath)
     }
 
     override fun onConnectSuccess() {
@@ -122,44 +262,47 @@ class HomeActivity : BaseActivity() {
 
     private fun getHome() {
         Api.request(this, Api.service.getHome(),
-                Consumer { result ->
-                    mCurrentHome = result.data?.firstOrNull()
-                    mListDevice.clear()
-                    mListSensor.clear()
-                    result.data?.firstOrNull()?.devices?.forEach { device ->
-                        if (device.type == "control") {
-                            mListDevice.add(device)
-                        } else {
-                            mListSensor.add(device)
-                        }
+            Consumer { result ->
+                mCurrentHome = result.data?.firstOrNull()
+                mListDevice.clear()
+                mListSensor.clear()
+                result.data?.firstOrNull()?.devices?.forEach { device ->
+                    if (device.type == "control") {
+                        mListDevice.add(device)
+                    } else {
+                        mListSensor.add(device)
                     }
+                }
 //                for(i in 0..10){
 //                    mListDevice.add((mListDevice.clone() as ArrayList<Device>)[0])
 //                }
-                    mSharedPreference.currentHome = result.data?.firstOrNull()
-                    setupRecyclerView()
-                    initViewPager()
-                    subscribeButtonState()
-                    Log.d("getDeviceApi", result.data?.size.toString())
-                }, Consumer {
-            Log.d("getDeviceApi", it.message.toString())
-        })
+                mSharedPreference.currentHome = result.data?.firstOrNull()
+                setupRecyclerView()
+                initViewPager()
+                subscribeButtonState()
+                Log.d("getDeviceApi", result.data?.size.toString())
+            }, Consumer {
+                Log.d("getDeviceApi", it.message.toString())
+            })
     }
 
     private fun subscribeButtonState() {
         if (mMqttClient.isConnected()) {
             mMqttClient.subscribe(
-                    mSharedPreference.currentUser?.id.toString(),
-                    1,
-                    object : IMqttActionListener {
-                        override fun onSuccess(asyncActionToken: IMqttToken?) {
-                            Log.d("MQTTClient", "Subscribe button state success ${mSharedPreference.currentUser?.id}")
-                        }
+                mSharedPreference.currentUser?.id.toString(),
+                1,
+                object : IMqttActionListener {
+                    override fun onSuccess(asyncActionToken: IMqttToken?) {
+                        Log.d(
+                            "MQTTClient",
+                            "Subscribe button state success ${mSharedPreference.currentUser?.id}"
+                        )
+                    }
 
-                        override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                            Log.d("MQTTClient", "Subscribe button state fail")
-                        }
-                    })
+                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                        Log.d("MQTTClient", "Subscribe button state fail")
+                    }
+                })
         } else {
             connectMqtt()
         }
@@ -257,10 +400,10 @@ class HomeActivity : BaseActivity() {
     fun showCustomDialog() {
         val alertDialogBuilder = AlertDialog.Builder(this)
         val binding = DataBindingUtil.inflate<LayoutLocationDialogBinding>(
-                LayoutInflater.from(this),
-                R.layout.layout_location_dialog,
-                null,
-                false
+            LayoutInflater.from(this),
+            R.layout.layout_location_dialog,
+            null,
+            false
         )
         alertDialogBuilder.setView(binding.root)
         val alert = alertDialogBuilder.show()
@@ -287,5 +430,28 @@ class HomeActivity : BaseActivity() {
         }
     }
 
+    override fun onNewLayout(
+        vout: IVLCVout?,
+        width: Int,
+        height: Int,
+        visibleWidth: Int,
+        visibleHeight: Int,
+        sarNum: Int,
+        sarDen: Int
+    ) {
+        if (width * height == 0) return
+        // store video size
+        mVideoWidth = width
+        mVideoHeight = height
+        setSize(mVideoWidth, mVideoHeight)
+    }
+
+    override fun onSurfacesCreated(vout: IVLCVout?) {}
+    override fun onSurfacesDestroyed(vout: IVLCVout?) {}
+    override fun onHardwareAccelerationError(vlcVout: IVLCVout?) {
+        Log.e(TAG, "Error with hardware acceleration")
+//        releasePlayer()
+        Toast.makeText(this, "Error with hardware acceleration", Toast.LENGTH_LONG).show()
+    }
 
 }
