@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -34,7 +33,6 @@ import com.quyt.iot_demo.service.getServiceState
 import com.quyt.iot_demo.ui.add.AddDeviceActivity
 import com.quyt.iot_demo.ui.location.MapActivity
 import com.quyt.iot_demo.ui.scenario.ScenarioActivity
-import com.quyt.iot_demo.utils.DialogUtils
 import io.reactivex.functions.Consumer
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
@@ -109,7 +107,8 @@ class HomeActivity : BaseActivity(), IVLCVout.Callback {
         }
 
         //
-        mFilePath = "rtsp://admin:IPNKXL@192.168.1.196:554/video.mp4"
+        mFilePath = "rtsp://admin:IPNKXL@192.168.1.2:554/video.mp4"
+
 //        Log.d(TAG, "Playing: $mFilePath")
 //        if (mSharedPreference.camera != null) {
 //            val camera = mSharedPreference.camera
@@ -123,6 +122,7 @@ class HomeActivity : BaseActivity(), IVLCVout.Callback {
 //                createPlayer(mFilePath)
 //            })
 //        }
+        Log.d("LifeCycle", "onCreate")
     }
 
     private fun setSize(width: Int, height: Int) {
@@ -133,7 +133,7 @@ class HomeActivity : BaseActivity(), IVLCVout.Callback {
         var w = window.decorView.width
         var h = window.decorView.height
         val isPortrait =
-            resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+                resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         if (w > h && isPortrait || w < h && !isPortrait) {
             val i = w
             w = h
@@ -151,6 +151,7 @@ class HomeActivity : BaseActivity(), IVLCVout.Callback {
     }
 
     private fun createPlayer(media: String) {
+//        releasePlayer()
         try {
 //            if (media.isNotEmpty()) {
 //                val toast = Toast.makeText(this, media, Toast.LENGTH_LONG)
@@ -225,8 +226,21 @@ class HomeActivity : BaseActivity(), IVLCVout.Callback {
 
     override fun onResume() {
         super.onResume()
-        getHome()
+        Log.d("LifeCycle", "onResume")
         createPlayer(mFilePath)
+        getHome()
+    }
+
+    private fun releasePlayer() {
+        if (libvlc == null) return
+        mMediaPlayer.release()
+        val vout = mMediaPlayer!!.vlcVout
+        vout.removeCallback(this)
+        vout.detachViews()
+        libvlc?.release()
+        libvlc = null
+        mVideoWidth = 0
+        mVideoHeight = 0
     }
 
     override fun onConnectSuccess() {
@@ -262,47 +276,47 @@ class HomeActivity : BaseActivity(), IVLCVout.Callback {
 
     private fun getHome() {
         Api.request(this, Api.service.getHome(),
-            Consumer { result ->
-                mCurrentHome = result.data?.firstOrNull()
-                mListDevice.clear()
-                mListSensor.clear()
-                result.data?.firstOrNull()?.devices?.forEach { device ->
-                    if (device.type == "control") {
-                        mListDevice.add(device)
-                    } else {
-                        mListSensor.add(device)
+                Consumer { result ->
+                    mCurrentHome = result.data?.firstOrNull()
+                    mListDevice.clear()
+                    mListSensor.clear()
+                    result.data?.firstOrNull()?.devices?.forEach { device ->
+                        if (device.type == "control") {
+                            mListDevice.add(device)
+                        } else {
+                            mListSensor.add(device)
+                        }
                     }
-                }
 //                for(i in 0..10){
 //                    mListDevice.add((mListDevice.clone() as ArrayList<Device>)[0])
 //                }
-                mSharedPreference.currentHome = result.data?.firstOrNull()
-                setupRecyclerView()
-                initViewPager()
-                subscribeButtonState()
-                Log.d("getDeviceApi", result.data?.size.toString())
-            }, Consumer {
-                Log.d("getDeviceApi", it.message.toString())
-            })
+                    mSharedPreference.currentHome = result.data?.firstOrNull()
+                    setupRecyclerView()
+                    initViewPager()
+                    subscribeButtonState()
+                    Log.d("getDeviceApi", result.data?.size.toString())
+                }, Consumer {
+            Log.d("getDeviceApi", it.message.toString())
+        })
     }
 
     private fun subscribeButtonState() {
         if (mMqttClient.isConnected()) {
             mMqttClient.subscribe(
-                mSharedPreference.currentUser?.id.toString(),
-                1,
-                object : IMqttActionListener {
-                    override fun onSuccess(asyncActionToken: IMqttToken?) {
-                        Log.d(
-                            "MQTTClient",
-                            "Subscribe button state success ${mSharedPreference.currentUser?.id}"
-                        )
-                    }
+                    mSharedPreference.currentUser?.id.toString(),
+                    1,
+                    object : IMqttActionListener {
+                        override fun onSuccess(asyncActionToken: IMqttToken?) {
+                            Log.d(
+                                    "MQTTClient",
+                                    "Subscribe button state success ${mSharedPreference.currentUser?.id}"
+                            )
+                        }
 
-                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                        Log.d("MQTTClient", "Subscribe button state fail")
-                    }
-                })
+                        override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                            Log.d("MQTTClient", "Subscribe button state fail")
+                        }
+                    })
         } else {
             connectMqtt()
         }
@@ -400,10 +414,10 @@ class HomeActivity : BaseActivity(), IVLCVout.Callback {
     fun showCustomDialog() {
         val alertDialogBuilder = AlertDialog.Builder(this)
         val binding = DataBindingUtil.inflate<LayoutLocationDialogBinding>(
-            LayoutInflater.from(this),
-            R.layout.layout_location_dialog,
-            null,
-            false
+                LayoutInflater.from(this),
+                R.layout.layout_location_dialog,
+                null,
+                false
         )
         alertDialogBuilder.setView(binding.root)
         val alert = alertDialogBuilder.show()
@@ -431,13 +445,13 @@ class HomeActivity : BaseActivity(), IVLCVout.Callback {
     }
 
     override fun onNewLayout(
-        vout: IVLCVout?,
-        width: Int,
-        height: Int,
-        visibleWidth: Int,
-        visibleHeight: Int,
-        sarNum: Int,
-        sarDen: Int
+            vout: IVLCVout?,
+            width: Int,
+            height: Int,
+            visibleWidth: Int,
+            visibleHeight: Int,
+            sarNum: Int,
+            sarDen: Int
     ) {
         if (width * height == 0) return
         // store video size

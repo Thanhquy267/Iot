@@ -60,20 +60,20 @@ class LocationService() : BaseLocationService() {
         if (mOldDistance == 0f) mOldDistance = distance
         if (mOldDistance > distance){
             if (distance < 200){
-                Log.d("Test Location","Đã về nhà")
+                Log.d("Test Location","Đã về nhà $mAtHome")
                 mGoHome++
             }else{
-                Log.d("Test Location","Đang về nhà")
+                Log.d("Test Location","Đang về nhà $mAtHome")
                 mGoHome = 0
                 mLeaveHome = 0
             }
         }else{
             if (distance < 100){
-                Log.d("Test Location","Đang ra khỏi nhà")
+                Log.d("Test Location","Đang ra khỏi nhà $mAtHome")
                 mGoHome = 0
                 mLeaveHome = 0
             }else{
-                Log.d("Test Location","Đã ra khỏi nhà")
+                Log.d("Test Location","Đã ra khỏi nhà $mAtHome")
                 mLeaveHome++
             }
         }
